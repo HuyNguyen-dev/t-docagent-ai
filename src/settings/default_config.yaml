@@ -1,0 +1,12 @@
+API:
+  API_NAME: 'DocAgent - Document Intelligence Multi-Agent System'
+  API_DESCRIPTION: 'Document Intelligence delivers autonomous document processing through a coordinated team of specialized agents. Each agent masters a critical phase of the document lifecycle – from initial configuration through extraction to end-to-end business processing.'
+  API_EMAIL: 'dimsagentic@gmail.com'
+  API_VERSION: '0.0.1'
+  API_DEBUG_MODE: False
+
+LOGGING:
+  UVICORN_FORMATTER: 'time="%(asctime)-15s" thread=%(thread)d module=%(module)s level=%(levelname)-7s message="%(message)s"'
+  FORMATTER: 'time="%(asctime)-15s" thread=%(thread)d module=%(module)s level=%(levelname)-7s %(message)s'
+  DATE_FORMATTER: '%Y-%m-%d %H:%M:%S'
+  ROTATION: 'midnight'

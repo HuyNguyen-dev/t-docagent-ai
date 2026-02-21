@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Document Work Item API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Document Work Item API</h1>
+        <div class="input-group">
+            <label for="dwi_id">Document Work Item ID (dwi_id):</label>
+            <input type="text" id="dwi_id" placeholder="Enter dwi_id">
+        </div>
+        <button onclick="downloadSourceFile()">Download Source File</button>
+        <button onclick="downloadLogs()">Download Extracted Content and Logs</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Base URL of your FastAPI server (update this to match your server)
+        const API_BASE_URL = "http://localhost:8888/api/v1/work-item";
+
+        // Function to display status messages
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById("status");
+            statusDiv.textContent = message;
+            statusDiv.className = isError ? "error" : "success";
+        }
+
+        // Function to download source file
+        async function downloadSourceFile() {
+            const dwiId = document.getElementById("dwi_id").value.trim();
+            if (!dwiId) {
+                showStatus("Please enter a valid dwi_id", true);
+                return;
+            }
+
+            try {
+                showStatus("Initiating source file download...");
+                const response = await fetch(`${API_BASE_URL}/${dwiId}/file/download`, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showStatus(`Error: ${errorData.message || "Failed to download source file"}`, true);
+                    return;
+                }
+
+                const contentDisposition = response.headers.get("content-disposition");
+                let filename = "downloaded_file";
+                if (contentDisposition && contentDisposition.includes("filename=")) {
+                    filename = contentDisposition.split("filename=")[1].replace(/"/g, "");
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                showStatus(`Source file "${filename}" downloaded successfully`);
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, true);
+            }
+        }
+
+        // Function to download extracted content and logs
+        async function downloadLogs() {
+            const dwiId = document.getElementById("dwi_id").value.trim();
+            if (!dwiId) {
+                showStatus("Please enter a valid dwi_id", true);
+                return;
+            }
+
+            try {
+                showStatus("Initiating logs download...");
+                const response = await fetch(`${API_BASE_URL}/${dwiId}/content/download`, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showStatus(`Error: ${errorData.message || "Failed to download logs"}`, true);
+                    return;
+                }
+
+                const contentDisposition = response.headers.get("content-disposition");
+                let filename = `extracted_content_${dwiId}.json`;
+                if (contentDisposition && contentDisposition.includes("filename=")) {
+                    filename = contentDisposition.split("filename=")[1].replace(/"/g, "");
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                showStatus(`Logs file "${filename}" downloaded successfully`);
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>

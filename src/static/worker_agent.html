@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@300..800&display=swap" rel="stylesheet">
+    <title>Worker Agent Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .chat-container {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .events-container {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .events {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .user {
+            background: #e3f2fd;
+            margin-left: 20%;
+        }
+
+        .assistant {
+            background: #f5f5f5;
+            margin-right: 20%;
+        }
+
+        .tool-card {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 5px solid;
+            font-family: sans-serif;
+            font-size: 0.9em;
+            margin-right: 20%;
+        }
+
+        .tool-card-body {
+            margin-top: 10px;
+            padding: 8px;
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .tool-card.running {
+            background-color: #f0f4f8;
+            border-left-color: #64b5f6;
+        }
+
+        .tool-card.completed {
+            background-color: #f1f8e9;
+            border-left-color: #a5d6a7;
+        }
+
+        .tool-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: 1px solid #ccc;
+            color: #555;
+            cursor: pointer;
+            width: 22px;
+            height: 22px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            padding: 0;
+        }
+
+        .tool-card.collapsed .tool-card-body {
+            display: none;
+        }
+
+        .tool-card-body {
+            margin-top: 10px;
+            padding: 8px;
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .tool-card-status {
+            font-weight: normal;
+        }
+
+        .event {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+            background: #fff;
+            border-left: 3px solid #007bff;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 3px solid #c62828;
+        }
+
+        .status {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 4px;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .tool-process {
+            margin: 10px 0;
+            padding: 15px;
+            background: #fff3e0;
+            border-radius: 4px;
+            border-left: 3px solid #ff9800;
+            animation: pulse 1.5s infinite;
+        }
+
+        .tool-complete {
+            margin: 10px 0;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            border-left: 3px solid #4caf50;
+            transition: all 0.3s ease;
+        }
+
+        .tool-name {
+            font-weight: bold;
+            color: #ff9800;
+        }
+
+        .tool-result {
+            margin-top: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .thinking {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .history-loader {
+            text-align: center;
+            padding: 10px;
+            color: #555;
+            display: none;
+        }
+        .thinking-dropdown {
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin: 10px 0;
+            padding: 0;
+            border: 1px solid #ccc;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .thinking-dropdown-header {
+            cursor: pointer;
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .thinking-dropdown-header:hover {
+            background: #ededed;
+        }
+        .thinking-dropdown-content {
+            padding: 10px;
+            display: none;
+            border-top: 1px solid #ccc;
+            font-family: monospace;
+            white-space: pre-line;
+            word-break: break-word;
+            background: #f5f5f5;
+        }
+        .thinking-dropdown.open .thinking-dropdown-content {
+            display: block;
+        }
+        .thinking-dropdown .dots {
+            margin-left: 8px;
+        }
+
+        .thinking-label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .thinking-content {
+            flex: 1;
+            overflow-wrap: break-word;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+    </style>
+    <style>
+        :root {
+            --bg-1: #0f1020;
+            --bg-2: #111827;
+            --accent-1: #7c3aed; /* purple */
+            --accent-2: #06b6d4; /* cyan */
+            --accent-3: #22c55e; /* green */
+            --accent-4: #f59e0b; /* amber */
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-bg-subtle: rgba(255, 255, 255, 0.06);
+            --glass-stroke: rgba(255, 255, 255, 0.18);
+            --text-primary: #e5e7eb;
+            --text-secondary: #cbd5e1;
+            --shadow-1: 0 8px 24px rgba(0, 0, 0, 0.35);
+            --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.35) inset;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 10px;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: "Inter", "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+            color: var(--text-primary);
+            background: radial-gradient(1000px 600px at 10% 10%, rgba(124, 58, 237, 0.25), transparent 60%),
+                        radial-gradient(1000px 600px at 90% 20%, rgba(6, 182, 212, 0.2), transparent 60%),
+                        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+            backdrop-filter: saturate(120%);
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.35;
+        }
+        body::before {
+            top: -120px;
+            left: -120px;
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle at 30% 30%, var(--accent-1), transparent 65%);
+        }
+        body::after {
+            right: -140px;
+            bottom: -140px;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle at 70% 70%, var(--accent-2), transparent 65%);
+        }
+
+        .chat-container,
+        .events-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-stroke);
+            -webkit-backdrop-filter: blur(14px) saturate(120%);
+            backdrop-filter: blur(14px) saturate(120%);
+            box-shadow: var(--shadow-1);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+        }
+
+        h2 {
+            margin: 0 0 14px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            background: linear-gradient(90deg, #fff, #d1d5db 40%, #9ca3af);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .messages,
+        .events {
+            background: var(--glass-bg-subtle);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-2);
+        }
+
+        .input-container {
+            background: var(--glass-bg-subtle);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: 10px;
+        }
+
+        input {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+        input:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        button {
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        button:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 14px 34px rgba(124, 58, 237, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 8px 22px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .message {
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+        .message.user {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(37, 99, 235, 0.2));
+            border-left: 4px solid rgba(59, 130, 246, 0.6);
+        }
+        .message.assistant {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+            border-left: 4px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+            border: 1px solid var(--glass-stroke);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+        .tool-card.running {
+            border-left: 6px solid #60a5fa;
+        }
+        .tool-card.completed {
+            border-left: 6px solid #34d399;
+        }
+
+        .tool-card-header {
+            padding: 6px 0 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .tool-card-header .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tool-icon {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(6, 182, 212, 0.25));
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+            font-size: 14px;
+        }
+        .tool-card-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .tool-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+            color: var(--text-secondary);
+        }
+        .tool-badge.running { background: linear-gradient(135deg, rgba(96,165,250,0.22), rgba(56,189,248,0.2)); color: #dbeafe; border-color: rgba(56,189,248,0.35); }
+        .tool-badge.completed { background: linear-gradient(135deg, rgba(34,197,94,0.22), rgba(16,185,129,0.2)); color: #dcfce7; border-color: rgba(16,185,129,0.35); }
+
+        .tool-card-body {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-sm);
+            margin-top: 10px;
+            padding: 10px;
+        }
+        .tool-card-body pre.tool-pre {
+            margin: 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 320px;
+            overflow: auto;
+        }
+        .tool-card.collapsed .tool-card-body { display: none; }
+
+        .collapse-btn {
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--text-primary);
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+        }
+        .collapse-btn:hover { filter: brightness(1.1); }
+
+        .status {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(16, 185, 129, 0.14));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #bbf7d0;
+        }
+        .status.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(244, 63, 94, 0.14));
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fecaca;
+        }
+
+        .thinking {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.12));
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            color: var(--text-primary);
+        }
+
+        .thinking-dropdown {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+            border: 1px solid var(--glass-stroke);
+        }
+        .thinking-dropdown-header { color: var(--text-primary); }
+        .thinking-dropdown-content { background: rgba(0, 0, 0, 0.25); }
+
+        .events .event {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .events .event.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(244, 63, 94, 0.10));
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        /* Scrollbar styling */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) rgba(2, 6, 23, 0.2);
+        }
+        *::-webkit-scrollbar { width: 10px; height: 10px; }
+        *::-webkit-scrollbar-track { background: rgba(2, 6, 23, 0.25); border-radius: 8px; }
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(148, 163, 184, 0.5), rgba(100, 116, 139, 0.45));
+            border: 2px solid rgba(2, 6, 23, 0.25);
+            border-radius: 8px;
+        }
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(203, 213, 225, 0.6), rgba(148, 163, 184, 0.55));
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chat</h2>
+        <div id="connectionStatus" class="status">Connecting to event stream...</div>
+        <div class="messages" id="messages">
+            <div class="history-loader" id="historyLoader">Loading...</div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <div class="events-container">
+        <h2>Events</h2>
+        <div class="events" id="events"></div>
+        <button onclick="clearEvents()">Clear Events</button>
+    </div>
+
+    <script>
+        const conv_id = 'conv-5c77005d-4ea9-48ba-aaea-cac111f53168';
+        
+        let currentMessage = '';
+        let eventsSource = null;
+        let currentAssistantMessageElement = null;
+        let historyOffset = 0;
+        let historyLimit = 5;
+        let allHistoryLoaded = false;
+        let isLoadingHistory = false;
+        let loadedMessageIds = new Set(); // Track loaded messages to prevent duplicates
+        // --- Thinking event state ---
+        let currentThinking = '';
+        let currentThinkingMessageId = null;
+        let currentThinkingElement = null;
+
+        // Connect to the events stream
+        function connectEventStream() {
+            if (eventsSource) {
+                eventsSource.close();
+            }
+
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.textContent = 'Connecting to event stream...';
+            statusDiv.className = 'status';
+
+            eventsSource = new EventSource(`http://localhost:8886/api/v1/worker-agent/${conv_id}/stream`);
+            
+            eventsSource.onopen = function() {
+                statusDiv.textContent = 'Connected to event stream';
+                statusDiv.className = 'status';
+                loadMoreMessages(true);
+            };
+
+            eventsSource.onmessage = function(event) {
+                const eventData = JSON.parse(event.data);
+                appendEvent(eventData);
+                
+                // Handle different event types
+                switch(eventData.type) {
+                    case 'USER_MESSAGE':
+                        appendMessage(eventData.text, 'user');
+                        break;
+                    case 'TEXT_MESSAGE_START':
+                        if (eventData.role === 'assistant') {
+                            currentAssistantMessageElement = appendMessage('', 'assistant');
+                            currentMessage = '';
+                        }
+                        break;
+                    case 'TEXT_MESSAGE_CONTENT':
+                        currentMessage += eventData.delta;
+                        updateCurrentMessage(currentMessage);
+                        break;
+                    case 'TEXT_MESSAGE_END':
+                        currentMessage = '';
+                        currentAssistantMessageElement = null;
+                        break;
+                    case 'THINKING_TEXT_MESSAGE_START':
+                        // Start a new thinking stream for this message
+                        currentThinking = '';
+                        currentThinkingMessageId = eventData.message_id;
+                        currentThinkingElement = showThinkingElement(currentThinkingMessageId, currentAssistantMessageElement);
+                        break;
+                    case 'THINKING_TEXT_MESSAGE_CONTENT':
+                        if (eventData.message_id === currentThinkingMessageId && currentThinkingElement) {
+                            currentThinking += eventData.delta;
+                            updateThinkingElement(currentThinkingElement, currentThinking);
+                        }
+                        break;
+                    case 'THINKING_TEXT_MESSAGE_END':
+                        if (eventData.message_id === currentThinkingMessageId && currentThinkingElement) {
+                            finishThinkingElement(currentThinkingElement);
+                            currentThinking = '';
+                            currentThinkingMessageId = null;
+                            currentThinkingElement = null;
+                        }
+                        break;
+                    case 'TOOL_CALL_START': {
+                        const messages = document.getElementById('messages');
+                        const toolCard = document.createElement('div');
+                        toolCard.id = `tool-card-${eventData.toolCallId}`;
+                        toolCard.className = 'message tool-card running';
+                        toolCard.innerHTML = `
+                            <div class="tool-card-header">
+                                <div class="left">
+                                    <div class="tool-icon">⚙️</div>
+                                    <span class="tool-card-title">${eventData.toolCallName}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="tool-badge running">Running</span>
+                                    <button class="collapse-btn" onclick="toggleToolCard(this)">-</button>
+                                </div>
+                            </div>
+                            <div class="tool-card-body"><pre class="tool-pre">Starting...</pre></div>
+                        `;
+                        messages.appendChild(toolCard);
+                        messages.scrollTop = messages.scrollHeight;
+                        break;
+                    }
+                    case 'TOOL_CALL_END': {
+                        const toolCard = document.getElementById(`tool-card-${eventData.toolCallId}`);
+                        if (toolCard) {
+                            toolCard.classList.remove('running');
+                            toolCard.classList.add('completed');
+                            const badge = toolCard.querySelector('.tool-badge');
+                            if (badge) {
+                                badge.classList.remove('running');
+                                badge.classList.add('completed');
+                                badge.textContent = 'Completed';
+                            }
+                            let toolBody = toolCard.querySelector('.tool-card-body');
+                            if (!toolBody) {
+                                toolBody = document.createElement('div');
+                                toolBody.className = 'tool-card-body';
+                                toolCard.appendChild(toolBody);
+                            }
+                            let pre = toolBody.querySelector('pre.tool-pre');
+                            if (!pre) {
+                                pre = document.createElement('pre');
+                                pre.className = 'tool-pre';
+                                toolBody.appendChild(pre);
+                            }
+                            pre.textContent = eventData.text || '[No tool output]';
+                        }
+                        break;
+                    }
+                }
+            };
+
+            eventsSource.onerror = function(error) {
+                console.error('EventSource failed:', error);
+                statusDiv.textContent = 'Connection failed. Reconnecting...';
+                statusDiv.className = 'status error';
+                eventsSource.close();
+                setTimeout(connectEventStream, 5000);  // Reconnect after 5 seconds
+            };
+        }
+
+        // Send a message to the worker agent
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            // appendMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const response = await fetch(`http://localhost:8886/api/v1/worker-agent/${conv_id}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                    },
+                    body: JSON.stringify({
+                        conv_id: conv_id,
+                        question: message,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Add empty assistant message that will be updated
+                // appendMessage('', 'assistant');
+                // currentMessage = '';
+
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('Error: Failed to send message', 'error');
+            }
+        }
+
+        // Append a message to the chat
+        function appendMessage(text, role) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.textContent = text;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+            return messageDiv;
+        }
+
+        // Show a thinking element in the chat
+        function showThinkingElement(messageId, beforeElement = null) {
+            let messages = document.getElementById('messages');
+            let thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'thinking-dropdown open';
+            thinkingDiv.id = `thinking-${messageId}`;
+            thinkingDiv.innerHTML = `
+                <div class="thinking-dropdown-header" onclick="toggleThinkingDropdown(this)">
+                    <span>Reasoning</span>
+                    <span class="dropdown-arrow" style="margin-left:auto;">&#9660;</span>
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+                <div class="thinking-dropdown-content">
+                    <span class="thinking-content"></span>
+                </div>
+            `;
+            // Insert before the given element, or at the end if none
+            if (beforeElement) {
+                messages.insertBefore(thinkingDiv, beforeElement);
+            } else {
+                messages.appendChild(thinkingDiv);
+            }
+            messages.scrollTop = messages.scrollHeight;
+            return thinkingDiv;
+        }
+
+        function updateThinkingElement(element, text) {
+            let contentSpan = element.querySelector('.thinking-content');
+            if (contentSpan) {
+                contentSpan.textContent = text;
+            }
+        }
+
+        function finishThinkingElement(element) {
+            // Remove dots and update arrow
+            let dots = element.querySelector('.dots');
+            if (dots) dots.remove();
+            let arrow = element.querySelector('.dropdown-arrow');
+            if (arrow) arrow.innerHTML = '&#9660;'; // Down arrow
+            element.classList.add('open'); // Keep open after finished
+            let content = element.querySelector('.thinking-dropdown-content');
+            if (content) content.style.display = 'block';
+        }
+
+        function toggleThinkingDropdown(header) {
+            let dropdown = header.closest('.thinking-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('open');
+                let arrow = header.querySelector('.dropdown-arrow');
+                if (arrow) {
+                    arrow.innerHTML = dropdown.classList.contains('open') ? '&#9660;' : '&#9654;';
+                }
+                // Show/hide content based on open state
+                let content = dropdown.querySelector('.thinking-dropdown-content');
+                if (content) {
+                    content.style.display = dropdown.classList.contains('open') ? 'block' : 'none';
+                }
+            }
+        }
+        window.toggleThinkingDropdown = toggleThinkingDropdown;
+
+        // Update the last message in the chat
+        function updateCurrentMessage(text) {
+            if (!currentAssistantMessageElement) return;
+
+            if (!text) {
+                currentAssistantMessageElement.innerHTML = `
+                        <div class="thinking">
+                            Thinking
+                            <div class="dots">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                    `;
+            } else {
+                currentAssistantMessageElement.textContent = text;
+            }
+            const messages = document.getElementById('messages');
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Append an event to the events panel
+        function appendEvent(eventData) {
+            const events = document.getElementById('events');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+
+            // Handle tool-related events
+            if (eventData.type === 'TOOL_START') {
+                eventDiv.className = 'tool-process';
+                eventDiv.innerHTML = `
+                    <div class="tool-name">${eventData.tool_name}</div>
+                    <div>Processing tool request...</div>
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                `;
+            } else if (eventData.type === 'TOOL_END') {
+                eventDiv.className = 'tool-complete';
+                eventDiv.innerHTML = `
+                    <div class="tool-name">${eventData.tool_name}</div>
+                    <div>Tool execution completed</div>
+                    <div class="tool-result">${JSON.stringify(eventData.result, null, 2)}</div>
+                `;
+            } else {
+                eventDiv.textContent = JSON.stringify(eventData, null, 2);
+            }
+
+            events.appendChild(eventDiv);
+            events.scrollTop = events.scrollHeight;
+        }
+
+        // Clear the events panel
+        function clearEvents() {
+            document.getElementById('events').innerHTML = '';
+        }
+
+        function toggleToolCard(button) {
+            const toolCard = button.closest('.tool-card');
+            if (toolCard) {
+                toolCard.classList.toggle('collapsed');
+                button.textContent = toolCard.classList.contains('collapsed') ? '+' : '-';
+            }
+        }
+
+        // Handle Enter key in input
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Check if container has free space and load more messages if needed
+        function checkAndLoadMoreIfNeeded() {
+            const messagesContainer = document.getElementById('messages');
+            if (!messagesContainer || allHistoryLoaded || isLoadingHistory) {
+                return;
+            }
+            
+            // Check if content height is less than container height (has free space)
+            const hasScrollableContent = messagesContainer.scrollHeight > messagesContainer.clientHeight;
+            
+            if (!hasScrollableContent) {
+                // Container has free space, load more messages
+                loadMoreMessages(false);
+            }
+        }
+
+        // Load conversation history
+        async function loadMoreMessages(clear = false) {
+            if (isLoadingHistory) {
+                return;
+            }
+            
+            if (!clear && allHistoryLoaded) {
+                return;
+            }
+
+            isLoadingHistory = true;
+            const loader = document.getElementById('historyLoader');
+            if (loader) {
+                loader.style.display = 'block';
+            }
+
+            if (clear) {
+                historyOffset = 0;
+                allHistoryLoaded = false;
+                loadedMessageIds.clear();
+                const messagesContainer = document.getElementById('messages');
+                messagesContainer.innerHTML = '<div class="history-loader" id="historyLoader">Loading...</div>';
+            }
+
+            try {
+                const url = `http://localhost:8886/api/v1/conversation/${conv_id}/history?limit=${historyLimit}&offset=${historyOffset}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    const messagesContainer = document.getElementById('messages');
+                    
+                    const historyData = result.data;
+                    const fetchedMessages = historyData.historical_messages || [];
+
+                    if (fetchedMessages.length === 0) {
+                        allHistoryLoaded = true;
+                        return;
+                    }
+
+                    // Filter out messages we've already loaded
+                    const newMessages = fetchedMessages.filter(msg => {
+                        const messageId = `${msg.role}-${msg.created_at}-${(msg.payload?.text || '').substring(0, 50)}`;
+                        if (loadedMessageIds.has(messageId)) {
+                            return false;
+                        }
+                        loadedMessageIds.add(messageId);
+                        return true;
+                    });
+                    
+                    if (newMessages.length === 0) {
+                        historyOffset += fetchedMessages.length;
+                        if (historyOffset < historyData.total) {
+                            // Try to load more since all were duplicates
+                            isLoadingHistory = false;
+                            return loadMoreMessages(false);
+                        } else {
+                            allHistoryLoaded = true;
+                            return;
+                        }
+                    }
+
+                    // Update offset by the number of messages we actually fetched
+                    historyOffset += fetchedMessages.length;
+                    
+                    if (historyOffset >= historyData.total) {
+                        allHistoryLoaded = true;
+                    }
+                    
+                    const oldScrollHeight = messagesContainer.scrollHeight;
+
+                    // Reverse messages so older messages are inserted first (correct chronological order)
+                    newMessages.reverse();
+
+                    let addedCount = 0;
+                    newMessages.forEach((msg, index) => {
+                        let messageElement = null;
+                        let thinkingDiv = null;
+
+                        if (msg.role === 'assistant') {
+                            if (msg.payload && msg.payload.thinking) {
+                                const tempId = `history-thinking-${index}-${Math.random().toString(36).slice(2)}`;
+                                thinkingDiv = showThinkingElement(tempId);
+                                updateThinkingElement(thinkingDiv, msg.payload.thinking);
+                                finishThinkingElement(thinkingDiv);
+                                // Collapse by default for history
+                                thinkingDiv.classList.remove('open');
+                                let arrow = thinkingDiv.querySelector('.dropdown-arrow');
+                                if (arrow) arrow.innerHTML = '&#9654;'; // Right arrow
+                                let content = thinkingDiv.querySelector('.thinking-dropdown-content');
+                                if (content) content.style.display = 'none';
+                            }
+                            messageElement = document.createElement('div');
+                            messageElement.className = `message ${msg.role}`;
+                            const messageText = (msg.payload && msg.payload.text) ? msg.payload.text : '[Empty message]';
+                            messageElement.textContent = messageText;
+                        } else if (msg.role === 'user') {
+                            messageElement = document.createElement('div');
+                            messageElement.className = `message ${msg.role}`;
+                            const messageText = (msg.payload && msg.payload.text) ? msg.payload.text : '[Empty message]';
+                            messageElement.textContent = messageText;
+                        } else if (msg.role === 'tool') {
+                            messageElement = document.createElement('div');
+                            messageElement.className = 'message tool-card completed collapsed';
+                            const toolName = (msg.payload && msg.payload.action && msg.payload.action.name) 
+                                ? msg.payload.action.name 
+                                : 'Unknown Tool';
+                            messageElement.innerHTML = `
+                                <div class="tool-card-header">
+                                    <div class="left">
+                                        <div class="tool-icon">🧰</div>
+                                        <span class="tool-card-title">${toolName}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="tool-badge completed">Completed</span>
+                                        <button class="collapse-btn" onclick="toggleToolCard(this)">+</button>
+                                    </div>
+                                </div>
+                                <div class="tool-card-body"><pre class="tool-pre"></pre></div>
+                            `;
+                            const pre = messageElement.querySelector('pre.tool-pre');
+                            const toolText = (msg.payload && msg.payload.text) ? msg.payload.text : '[No tool output]';
+                            pre.textContent = toolText;
+                        }
+
+                        // Always append in order: insert thinkingDiv before messageElement if present
+                        if (messageElement) {
+                            const loaderElement = document.getElementById('historyLoader');
+                            if (loaderElement) {
+                                loaderElement.insertAdjacentElement('afterend', messageElement);
+                            } else {
+                                messagesContainer.appendChild(messageElement);
+                            }
+                            if (thinkingDiv) {
+                                messagesContainer.insertBefore(thinkingDiv, messageElement);
+                            }
+                        }
+                    });
+                    
+                    if (clear) {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    } else {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight - oldScrollHeight;
+                    }
+                } else {
+                    allHistoryLoaded = true;
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+                allHistoryLoaded = true;
+            } finally {
+                isLoadingHistory = false;
+                const loaderElement = document.getElementById('historyLoader');
+                if (loaderElement) {
+                    loaderElement.style.display = 'none';
+                }
+                
+                // After loading, check if we need to load more to fill the container
+                setTimeout(() => {
+                    checkAndLoadMoreIfNeeded();
+                }, 100);
+            }
+        }
+        
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.addEventListener('scroll', () => {
+            // Only trigger load when scrolled to the very top AND there's more history to load
+            if (messagesContainer.scrollTop === 0 && !allHistoryLoaded && !isLoadingHistory) {
+                loadMoreMessages();
+            }
+        });
+
+        // Initialize
+        connectEventStream();
+    </script>
+</body>
+</html>

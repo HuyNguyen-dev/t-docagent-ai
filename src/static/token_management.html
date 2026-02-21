@@ -1,0 +1,3314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@300..800&display=swap" rel="stylesheet">
+    <title>DIMS-AI Token Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        /* Shadcn/ui inspired styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 24px 32px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 140px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #64748b;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .sidebar-nav a:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .sidebar-nav a.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .sidebar-nav .icon {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            background: #f8fafc;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control-sm {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .token-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .token-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .token-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .token-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .token-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .token-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .scope-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .scope-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .scope-tag.admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .scope-tag.read {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .scope-tag.system {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #495057;
+        }
+
+        .scope-selector {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .scope-category {
+            margin-bottom: 20px;
+        }
+
+        .scope-category-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .scope-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .scope-option {
+            display: block;
+            padding: 0;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scope-option:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+        }
+
+        .scope-option.checked {
+            background: #e3f2fd;
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        .scope-card {
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .scope-checkbox {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .scope-content {
+            flex: 1;
+        }
+
+        .scope-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .scope-description {
+            color: #6c757d;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .scope-badge {
+            display: inline-block;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        .scope-badge.admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .scope-badge.read {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .scope-badge.system {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-section {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .role-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .role-status-badge {
+            background: #6c757d;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-scope-editor {
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            padding: 20px;
+            background: white;
+            margin-top: 15px;
+        }
+
+        .scope-editor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .scope-editor-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .scope-editor-item:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .scope-editor-item.selected {
+            background: #e3f2fd;
+            border-color: #007bff;
+        }
+
+        .scope-editor-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .scope-editor-category {
+            margin-bottom: 20px;
+        }
+
+        .scope-editor-category-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .custom-role-section {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8f9fc;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .custom-role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .custom-role-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-role-icon {
+            font-size: 1.5rem;
+        }
+
+        .custom-role-name {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .custom-role-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .delete-role-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .delete-role-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .role-creation-help {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        .scope-selection-summary {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .selected-scopes-count {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .users-container {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .user-role-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-role-badge.owner {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-role-badge.admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .user-role-badge.user {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .user-role-badge.custom {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .user-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .user-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .user-status.suspended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .user-last-seen {
+            color: #6c757d;
+            font-size: 0.75rem;
+        }
+
+        .user-management-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-section {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .no-users-found {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .no-users-found .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .filter-section {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .user-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .user-info {
+                width: 100%;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        .role-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .role-owner {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .role-user {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .token-display {
+            background: #f8f9fa;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .token-container {
+            margin: 15px 0;
+        }
+
+        .token-value-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .token-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            word-break: break-all;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            line-height: 1.4;
+            transition: all 0.3s ease;
+        }
+
+        .token-value-hidden {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            line-height: 1.4;
+            letter-spacing: 2px;
+            color: #6c757d;
+        }
+
+        .token-actions-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .token-value.copied {
+            border-color: #28a745;
+            background: #d4edda;
+            animation: copySuccess 0.5s ease;
+        }
+
+        @keyframes copySuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-token-action {
+            min-width: 140px;
+            font-weight: 600;
+        }
+
+        .token-visibility-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #6c757d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 10px;
+                padding-bottom: 10px;
+            }
+
+            .sidebar-nav li {
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .scope-options {
+                grid-template-columns: 1fr;
+            }
+
+            .scope-card {
+                padding: 12px;
+            }
+
+            .scope-title {
+                font-size: 0.9rem;
+            }
+
+            .scope-description {
+                font-size: 0.8rem;
+            }
+
+            .token-management-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+
+        .token-management-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <div class="header-icon">🔐</div>
+                    <div class="header-text">
+                        <h1>DIMS-AI Token Management</h1>
+                        <p>Secure access token management with role-based permissions and scope control</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <ul class="sidebar-nav">
+                    <li><a href="#" class="nav-link active" data-section="dashboard">
+                        <span class="icon">📊</span> Dashboard
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="token-management">
+                        <span class="icon">🎫</span> Token Management
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="role-management">
+                        <span class="icon">👥</span> Role Management
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="user-management">
+                        <span class="icon">👤</span> User Management
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="audit-logs">
+                        <span class="icon">📋</span> Audit Logs
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h2 class="section-title">Dashboard</h2>
+                    </div>
+
+                    <div class="role-info">
+                        <div class="role-badge role-owner">Owner</div>
+                        <p><strong>Current User:</strong> john.doe@company.com</p>
+                        <p><strong>Available Scopes:</strong> api (Full Access)</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Active Tokens</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">2</div>
+                            <div class="stat-label">Expired Tokens</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">847</div>
+                            <div class="stat-label">API Calls Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">99.8%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Recent Activity</div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Token</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Token Created</td>
+                                    <td>API Integration Token</td>
+                                    <td>2024-01-15 10:30</td>
+                                    <td><span class="status-badge status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Token Used</td>
+                                    <td>Development Token</td>
+                                    <td>2024-01-15 09:15</td>
+                                    <td><span class="status-badge status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Token Expired</td>
+                                    <td>Temporary Access</td>
+                                    <td>2024-01-14 23:59</td>
+                                    <td><span class="status-badge status-expired">Expired</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Token Management Section -->
+                <div id="token-management" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Token Management</h2>
+                        <button class="btn btn-primary" onclick="toggleCreateToken()">
+                            ➕ Create New Token
+                        </button>
+                    </div>
+
+                    <!-- Create Token Form (Hidden by default) -->
+                    <div id="create-token-container" style="display: none;">
+                        <div class="card" style="margin-bottom: 30px; border: 2px solid #007bff;">
+                            <div class="card-header" style="background: #e3f2fd; color: #1565c0;">
+                                🆕 Create New Access Token
+                            </div>
+                            <form id="create-token-form">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                    <div class="form-group">
+                                        <label class="form-label">Token Name</label>
+                                        <input type="text" class="form-control" id="token-name" placeholder="e.g., API Integration Token" required>
+                                        <small style="color: #6c757d; margin-top: 5px; display: block;">Choose a descriptive name to identify this token</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Expiration</label>
+                                        <select class="form-control" id="token-expiration">
+                                            <option value="7">7 days</option>
+                                            <option value="30">30 days</option>
+                                            <option value="90" selected>90 days</option>
+                                            <option value="365">1 year</option>
+                                            <option value="never">Never expires</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Description (Optional)</label>
+                                    <textarea class="form-control" id="token-description" rows="2" placeholder="Describe what this token will be used for..."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Scope Selection</label>
+                                    <div class="scope-selector">
+                                        <!-- Core API Scopes -->
+                                        <div class="scope-category">
+                                            <div class="scope-category-title">🔑 Core API Access</div>
+                                            <div class="scope-options">
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="read_api" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Read API</div>
+                                                            <div class="scope-description">Read-only access to all API endpoints. Perfect for monitoring, analytics, and data visualization without modification permissions.</div>
+                                                            <span class="scope-badge read">read_api</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="api" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Full API Access</div>
+                                                            <div class="scope-description">Complete access to all API functionality including read, write, and administrative operations. Use with caution.</div>
+                                                            <span class="scope-badge system">api</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Agent Scopes -->
+                                        <div class="scope-category">
+                                            <div class="scope-category-title">🤖 Agent Management</div>
+                                            <div class="scope-options">
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="agent_read" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">View Agents</div>
+                                                            <div class="scope-description">Read-only access to view agent configurations, types, and status information.</div>
+                                                            <span class="scope-badge read">agent_read</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="agent_admin" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Manage Agents</div>
+                                                            <div class="scope-description">Full administrative access to create, modify, configure, and delete AI agents and their settings.</div>
+                                                            <span class="scope-badge admin">agent_admin</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="agent_conversation" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Chat with Agents</div>
+                                                            <div class="scope-description">Ability to start conversations and interact with AI agents through chat interfaces.</div>
+                                                            <span class="scope-badge">agent_conversation</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="agent_execution" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Execute Workflows</div>
+                                                            <div class="scope-description">Permission to execute agent workflows, runbooks, and automated processes.</div>
+                                                            <span class="scope-badge">agent_execution</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Document Scopes -->
+                                        <div class="scope-category">
+                                            <div class="scope-category-title">📄 Document Processing</div>
+                                            <div class="scope-options">
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="document_read" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">View Documents</div>
+                                                            <div class="scope-description">Read-only access to view document types, formats, and processing status.</div>
+                                                            <span class="scope-badge read">document_read</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="document_admin" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Manage Documents</div>
+                                                            <div class="scope-description">Full administrative access to create, modify, and delete document types and formats.</div>
+                                                            <span class="scope-badge admin">document_admin</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="document_processing" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Process Documents</div>
+                                                            <div class="scope-description">Permission to trigger document processing workflows and AI analysis operations.</div>
+                                                            <span class="scope-badge">document_processing</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="document_upload" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Upload Files</div>
+                                                            <div class="scope-description">Ability to upload documents and files for processing and analysis.</div>
+                                                            <span class="scope-badge">document_upload</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- LLM Scopes -->
+                                        <div class="scope-category">
+                                            <div class="scope-category-title">🧠 AI & LLM</div>
+                                            <div class="scope-options">
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="llm_access" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">LLM Services</div>
+                                                            <div class="scope-description">Access to large language model services for text generation, completion, and AI operations.</div>
+                                                            <span class="scope-badge">llm_access</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="llm_streaming" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Streaming Responses</div>
+                                                            <div class="scope-description">Permission to use streaming LLM services for real-time response generation.</div>
+                                                            <span class="scope-badge">llm_streaming</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="ai_agent_chat" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">AI Agent Chat</div>
+                                                            <div class="scope-description">Specialized access to conversational AI agents and chat-based interactions.</div>
+                                                            <span class="scope-badge">ai_agent_chat</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- System Scopes -->
+                                        <div class="scope-category">
+                                            <div class="scope-category-title">⚙️ System & Management</div>
+                                            <div class="scope-options">
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="system_health" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">System Health</div>
+                                                            <div class="scope-description">Access to system health checks, monitoring data, and platform status information.</div>
+                                                            <span class="scope-badge">system_health</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="token_self_manage" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Manage Own Tokens</div>
+                                                            <div class="scope-description">Permission to create, view, and revoke your own access tokens and API keys.</div>
+                                                            <span class="scope-badge">token_self_manage</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                <label class="scope-option">
+                                                    <div class="scope-card">
+                                                        <input type="checkbox" name="scopes" value="token_admin" class="scope-checkbox">
+                                                        <div class="scope-content">
+                                                            <div class="scope-title">Token Administration</div>
+                                                            <div class="scope-description">Administrative access to manage all users' tokens and system-wide token policies.</div>
+                                                            <span class="scope-badge admin">token_admin</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                    <button type="submit" class="btn btn-primary">Create Token</button>
+                                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Existing Tokens List -->
+                    <div class="card">
+                        <div class="card-header">My Access Tokens</div>
+                        <div class="token-list">
+                            <div class="token-card">
+                                <div class="token-header">
+                                    <div>
+                                        <div class="token-name">API Integration Token</div>
+                                        <div class="token-meta">
+                                            Created: Jan 15, 2024 • Last used: 2 hours ago • 
+                                            <span class="status-badge status-active">Active</span>
+                                        </div>
+                                    </div>
+                                    <div class="token-actions">
+                                        <button class="btn btn-secondary btn-sm" onclick="showTokenDetails('token1')">View</button>
+                                        <button class="btn btn-danger btn-sm" onclick="revokeToken('token1')">Revoke</button>
+                                    </div>
+                                </div>
+                                <div class="scope-tags">
+                                    <span class="scope-tag read">read_api</span>
+                                    <span class="scope-tag">agent_conversation</span>
+                                    <span class="scope-tag">llm_access</span>
+                                </div>
+                            </div>
+
+                            <div class="token-card">
+                                <div class="token-header">
+                                    <div>
+                                        <div class="token-name">Development Token</div>
+                                        <div class="token-meta">
+                                            Created: Jan 10, 2024 • Last used: 1 day ago • 
+                                            <span class="status-badge status-active">Active</span>
+                                        </div>
+                                    </div>
+                                    <div class="token-actions">
+                                        <button class="btn btn-secondary btn-sm" onclick="showTokenDetails('token2')">View</button>
+                                        <button class="btn btn-danger btn-sm" onclick="revokeToken('token2')">Revoke</button>
+                                    </div>
+                                </div>
+                                <div class="scope-tags">
+                                    <span class="scope-tag admin">agent_admin</span>
+                                    <span class="scope-tag admin">document_admin</span>
+                                    <span class="scope-tag">read_api</span>
+                                </div>
+                            </div>
+
+                            <div class="token-card">
+                                <div class="token-header">
+                                    <div>
+                                        <div class="token-name">Temporary Access</div>
+                                        <div class="token-meta">
+                                            Created: Jan 5, 2024 • Expired: Jan 14, 2024 • 
+                                            <span class="status-badge status-expired">Expired</span>
+                                        </div>
+                                    </div>
+                                    <div class="token-actions">
+                                        <button class="btn btn-secondary btn-sm" onclick="showTokenDetails('token3')">View</button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteToken('token3')">Delete</button>
+                                    </div>
+                                </div>
+                                <div class="scope-tags">
+                                    <span class="scope-tag read">document_read</span>
+                                    <span class="scope-tag">work_item_download</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Management Section -->
+                <div id="role-management" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Role Management</h2>
+                        <div id="role-management-actions">
+                            <button class="btn btn-primary" onclick="showCreateRoleModal()" style="display: none;">
+                                ➕ Create Custom Role
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">System Roles & Permissions</div>
+                        
+                        <!-- Owner Role (Non-editable) -->
+                        <div class="role-section" data-role="owner" style="margin-bottom: 30px;">
+                            <div class="role-header">
+                                <h4 style="color: #2c3e50; margin-bottom: 15px;">👑 Owner</h4>
+                                <span class="role-status-badge">Protected</span>
+                            </div>
+                            <p style="margin-bottom: 10px; color: #6c757d;">Ultimate system authority with complete access to all functionality. This role cannot be modified.</p>
+                            <div class="scope-tags">
+                                <span class="scope-tag system">api (Full Access)</span>
+                            </div>
+                        </div>
+
+                        <!-- Admin Role (Editable for Owner) -->
+                        <div class="role-section" data-role="admin" style="margin-bottom: 30px;">
+                            <div class="role-header">
+                                <h4 style="color: #2c3e50; margin-bottom: 15px;">⚙️ Admin</h4>
+                                <div class="role-actions">
+                                    <button class="btn btn-secondary btn-sm edit-role-btn" onclick="toggleRoleEdit('admin')" style="display: none;">
+                                        ✏️ Edit Scopes
+                                    </button>
+                                    <button class="btn btn-success btn-sm save-role-btn" onclick="saveRoleScopes('admin')" style="display: none;">
+                                        💾 Save Changes
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm cancel-role-btn" onclick="cancelRoleEdit('admin')" style="display: none;">
+                                        ❌ Cancel
+                                    </button>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 10px; color: #6c757d;">Administrative access to manage platform features and content.</p>
+                            <div class="role-scope-display" id="admin-scope-display">
+                                <div class="scope-tags">
+                                    <span class="scope-tag admin">agent_admin</span>
+                                    <span class="scope-tag admin">document_admin</span>
+                                    <span class="scope-tag admin">action_package_admin</span>
+                                    <span class="scope-tag admin">conversation_admin</span>
+                                    <span class="scope-tag admin">runbook_admin</span>
+                                    <span class="scope-tag admin">work_item_admin</span>
+                                    <span class="scope-tag">llm_access</span>
+                                    <span class="scope-tag">llm_streaming</span>
+                                    <span class="scope-tag">document_processing</span>
+                                    <span class="scope-tag">document_upload</span>
+                                    <span class="scope-tag">document_intelligence</span>
+                                    <span class="scope-tag">agent_execution</span>
+                                    <span class="scope-tag read">read_api</span>
+                                    <span class="scope-tag">system_health</span>
+                                    <span class="scope-tag">token_self_manage</span>
+                                </div>
+                            </div>
+                            <div class="role-scope-editor" id="admin-scope-editor" style="display: none;">
+                                <!-- Scope editor will be dynamically populated -->
+                            </div>
+                        </div>
+
+                        <!-- User Role (Editable for Owner) -->
+                        <div class="role-section" data-role="user" style="margin-bottom: 30px;">
+                            <div class="role-header">
+                                <h4 style="color: #2c3e50; margin-bottom: 15px;">👤 User</h4>
+                                <div class="role-actions">
+                                    <button class="btn btn-secondary btn-sm edit-role-btn" onclick="toggleRoleEdit('user')" style="display: none;">
+                                        ✏️ Edit Scopes
+                                    </button>
+                                    <button class="btn btn-success btn-sm save-role-btn" onclick="saveRoleScopes('user')" style="display: none;">
+                                        💾 Save Changes
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm cancel-role-btn" onclick="cancelRoleEdit('user')" style="display: none;">
+                                        ❌ Cancel
+                                    </button>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 10px; color: #6c757d;">Standard user access for daily operations and AI interactions.</p>
+                            <div class="role-scope-display" id="user-scope-display">
+                                <div class="scope-tags">
+                                    <span class="scope-tag read">read_api</span>
+                                    <span class="scope-tag">agent_conversation</span>
+                                    <span class="scope-tag">conversation_participate</span>
+                                    <span class="scope-tag">ai_agent_chat</span>
+                                    <span class="scope-tag">llm_access</span>
+                                    <span class="scope-tag">document_processing</span>
+                                    <span class="scope-tag">document_upload</span>
+                                    <span class="scope-tag">work_item_download</span>
+                                    <span class="scope-tag read">work_item_read</span>
+                                    <span class="scope-tag read">agent_read</span>
+                                    <span class="scope-tag read">document_read</span>
+                                    <span class="scope-tag read">conversation_read</span>
+                                    <span class="scope-tag read">action_package_read</span>
+                                    <span class="scope-tag read">runbook_read</span>
+                                    <span class="scope-tag">system_health</span>
+                                    <span class="scope-tag">token_self_manage</span>
+                                </div>
+                            </div>
+                            <div class="role-scope-editor" id="user-scope-editor" style="display: none;">
+                                <!-- Scope editor will be dynamically populated -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Roles Section -->
+                    <div class="card" id="custom-roles-card" style="display: none;">
+                        <div class="card-header">Custom Roles</div>
+                        <div id="custom-roles-container">
+                            <!-- Custom roles will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Role Modal -->
+                <div id="create-role-modal" class="modal">
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h3 class="modal-title">🆕 Create Custom Role</h3>
+                            <button class="close-btn" onclick="closeModal('create-role-modal')">&times;</button>
+                        </div>
+                        <form id="create-role-form">
+                            <div class="form-group">
+                                <label class="form-label">Role Name</label>
+                                <input type="text" class="form-control" id="custom-role-name" placeholder="e.g., Document Specialist" required>
+                                <small style="color: #6c757d; margin-top: 5px; display: block;">Choose a descriptive name for this role</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Role Description</label>
+                                <textarea class="form-control" id="custom-role-description" rows="3" placeholder="Describe what this role is for and what users can do..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Role Icon (Optional)</label>
+                                <input type="text" class="form-control" id="custom-role-icon" placeholder="e.g., 📊 or 🔧" maxlength="2">
+                                <small style="color: #6c757d; margin-top: 5px; display: block;">Add an emoji icon to represent this role</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Scope Selection</label>
+                                <div class="scope-selector" id="custom-role-scope-selector">
+                                    <!-- Will be populated with scope options -->
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                <button type="submit" class="btn btn-primary">Create Role</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeModal('create-role-modal')">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- User Management Section -->
+                <div id="user-management" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">User Management</h2>
+                        <div class="user-management-actions">
+                            <button class="btn btn-primary" onclick="showInviteUserModal()" style="display: none;">
+                                ➕ Invite User
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- User Statistics -->
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Pending Invites</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">1</div>
+                            <div class="stat-label">Suspended</div>
+                        </div>
+                    </div>
+
+                    <!-- User Search and Filters -->
+                    <div class="card" style="margin-bottom: 25px;">
+                        <div class="card-header">Search & Filter Users</div>
+                        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 15px; align-items: end;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Search Users</label>
+                                <input type="text" class="form-control" id="user-search" placeholder="Search by name, email, or role..." oninput="filterUsers()">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Filter by Role</label>
+                                <select class="form-control" id="role-filter" onchange="filterUsers()">
+                                    <option value="">All Roles</option>
+                                    <option value="owner">Owner</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">User</option>
+                                    <option value="custom">Custom Roles</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Filter by Status</label>
+                                <select class="form-control" id="status-filter" onchange="filterUsers()">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users List -->
+                    <div class="card">
+                        <div class="card-header">System Users</div>
+                        <div class="users-container" id="users-container">
+                            <!-- Users will be dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invite User Modal -->
+                <div id="invite-user-modal" class="modal">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h3 class="modal-title">👤 Invite New User</h3>
+                            <button class="close-btn" onclick="closeModal('invite-user-modal')">&times;</button>
+                        </div>
+                        <form id="invite-user-form">
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="invite-email" placeholder="user@company.com" required>
+                                <small style="color: #6c757d; margin-top: 5px; display: block;">The user will receive an invitation email</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="invite-name" placeholder="John Doe" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Assign Role</label>
+                                <select class="form-control" id="invite-role" required>
+                                    <option value="">Select a role...</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">User</option>
+                                    <!-- Custom roles will be added dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Welcome Message (Optional)</label>
+                                <textarea class="form-control" id="invite-message" rows="3" placeholder="Welcome to our team! Please join us on the DIMS-AI platform..."></textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                <button type="submit" class="btn btn-primary">Send Invitation</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeModal('invite-user-modal')">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Edit User Modal -->
+                <div id="edit-user-modal" class="modal">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h3 class="modal-title">✏️ Edit User</h3>
+                            <button class="close-btn" onclick="closeModal('edit-user-modal')">&times;</button>
+                        </div>
+                        <form id="edit-user-form">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="edit-user-name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="edit-user-email" required readonly>
+                                <small style="color: #6c757d; margin-top: 5px; display: block;">Email cannot be changed</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Role</label>
+                                <select class="form-control" id="edit-user-role" required>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">User</option>
+                                    <!-- Custom roles will be added dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" id="edit-user-status" required>
+                                    <option value="active">Active</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-modal')">Cancel</button>
+                                <button type="button" class="btn btn-danger" onclick="deleteUser()" id="delete-user-btn">Delete User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Audit Logs Section -->
+                <div id="audit-logs" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Audit Logs</h2>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Token Activity Log</div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Token</th>
+                                    <th>IP Address</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2024-01-15 10:30:45</td>
+                                    <td>john.doe</td>
+                                    <td>Token Created</td>
+                                    <td>API Integration Token</td>
+                                    <td>192.168.1.100</td>
+                                    <td><span class="status-badge status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-15 09:15:23</td>
+                                    <td>API Token</td>
+                                    <td>API Call</td>
+                                    <td>Development Token</td>
+                                    <td>10.0.0.5</td>
+                                    <td><span class="status-badge status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-14 23:59:59</td>
+                                    <td>System</td>
+                                    <td>Token Expired</td>
+                                    <td>Temporary Access</td>
+                                    <td>-</td>
+                                    <td><span class="status-badge status-expired">Expired</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024-01-14 16:22:11</td>
+                                    <td>jane.smith</td>
+                                    <td>Token Revoked</td>
+                                    <td>Old Integration</td>
+                                    <td>192.168.1.101</td>
+                                    <td><span class="status-badge status-expired">Revoked</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Creation Success Modal -->
+    <div id="token-success-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🎉 Token Created Successfully!</h3>
+                <button class="close-btn" onclick="closeModal('token-success-modal')">&times;</button>
+            </div>
+            <div class="alert alert-warning">
+                <strong>⚠️ Important:</strong> This is the only time you'll see this token. Please copy it now and store it securely.
+            </div>
+            <div class="token-display">
+                <p><strong>Token Name:</strong> <span id="created-token-name"></span></p>
+                <div class="token-container">
+                    <div class="token-value-wrapper">
+                        <div class="token-value" id="created-token-value">
+                            dims_token_abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567
+                        </div>
+                        <div class="token-value-hidden" id="created-token-hidden" style="display: none;">
+                            ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+                        </div>
+                    </div>
+                    <div class="token-actions-row">
+                        <button class="btn btn-primary" onclick="copyCreatedToken()" id="copy-token-btn">
+                            📋 Copy Token
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleTokenVisibility()" id="toggle-visibility-btn">
+                            👁️ Hide Token
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <p><strong>Selected Scopes:</strong></p>
+                <div class="scope-tags" id="created-token-scopes">
+                    <!-- Scopes will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Details Modal -->
+    <div id="token-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Token Details</h3>
+                <button class="close-btn" onclick="closeModal('token-details-modal')">&times;</button>
+            </div>
+            <div>
+                <p><strong>Name:</strong> <span id="detail-token-name">API Integration Token</span></p>
+                <p><strong>Created:</strong> <span id="detail-token-created">Jan 15, 2024 10:30 AM</span></p>
+                <p><strong>Last Used:</strong> <span id="detail-token-last-used">2 hours ago</span></p>
+                <p><strong>Expires:</strong> <span id="detail-token-expires">Apr 15, 2024</span></p>
+                <p><strong>Status:</strong> <span class="status-badge status-active" id="detail-token-status">Active</span></p>
+                
+                <!-- Token Value Display (for active tokens only) -->
+                <div id="detail-token-value-section" style="margin: 20px 0; display: none;">
+                    <p><strong>Access Token:</strong></p>
+                    <div class="token-container">
+                        <div class="token-value-wrapper">
+                            <div class="token-value" id="detail-token-value">
+                                dims_token_example123456789abcdef...
+                            </div>
+                            <div class="token-value-hidden" id="detail-token-hidden" style="display: none;">
+                                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+                            </div>
+                        </div>
+                        <div class="token-actions-row">
+                            <button class="btn btn-primary btn-sm" onclick="copyDetailToken()" id="copy-detail-token-btn">
+                                📋 Copy Token
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="toggleDetailTokenVisibility()" id="toggle-detail-visibility-btn">
+                                👁️ Hide Token
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning" style="margin-top: 15px; font-size: 0.9rem;">
+                        <strong>Security Note:</strong> Keep this token secure. Anyone with this token can access your API with the granted permissions.
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <p><strong>Granted Scopes:</strong></p>
+                    <div class="scope-tags" id="detail-token-scopes">
+                        <span class="scope-tag read">read_api</span>
+                        <span class="scope-tag">agent_conversation</span>
+                        <span class="scope-tag">llm_access</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h4>Recent Usage</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Timestamp</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/agent/123</td>
+                                <td>GET</td>
+                                <td>2 hours ago</td>
+                                <td><span class="status-badge status-active">200</span></td>
+                            </tr>
+                            <tr>
+                                <td>/llm/ainvoke</td>
+                                <td>POST</td>
+                                <td>3 hours ago</td>
+                                <td><span class="status-badge status-active">200</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all nav links and sections
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked nav link
+                this.classList.add('active');
+                
+                // Show corresponding section
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // Scope selection functionality
+        document.querySelectorAll('input[name="scopes"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const option = this.closest('.scope-option');
+                if (this.checked) {
+                    option.classList.add('checked');
+                } else {
+                    option.classList.remove('checked');
+                }
+            });
+        });
+
+        // Make entire scope card clickable
+        document.querySelectorAll('.scope-option').forEach(option => {
+            option.addEventListener('click', function(e) {
+                // Allow clicks anywhere on the card except directly on the checkbox input
+                if (e.target.type !== 'checkbox') {
+                    e.preventDefault();
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        
+                        // Trigger both change and click events to ensure all handlers fire
+                        const changeEvent = new Event('change', { bubbles: true });
+                        const clickEvent = new Event('click', { bubbles: true });
+                        checkbox.dispatchEvent(changeEvent);
+                        checkbox.dispatchEvent(clickEvent);
+                    }
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('create-token-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tokenName = document.getElementById('token-name').value;
+            const tokenDescription = document.getElementById('token-description').value;
+            const tokenExpiration = document.getElementById('token-expiration').value;
+            const selectedScopes = Array.from(document.querySelectorAll('input[name="scopes"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedScopes.length === 0) {
+                alert('Please select at least one scope for the token.');
+                return;
+            }
+
+            // Simulate API call
+            createToken({
+                name: tokenName,
+                description: tokenDescription,
+                expiration: tokenExpiration,
+                scopes: selectedScopes
+            });
+        });
+
+        function createToken(tokenData) {
+            // Simulate API call with loading state
+            const submitBtn = document.querySelector('#create-token-form button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating...';
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                // Simulate successful token creation
+                const generatedToken = `dims_token_${Math.random().toString(36).substr(2, 50)}`;
+                
+                // Show success modal
+                document.getElementById('created-token-name').textContent = tokenData.name;
+                document.getElementById('created-token-value').textContent = generatedToken;
+                
+                // Reset token visibility state
+                tokenVisible = true;
+                document.getElementById('created-token-value').style.display = 'block';
+                document.getElementById('created-token-hidden').style.display = 'none';
+                document.getElementById('toggle-visibility-btn').textContent = '👁️ Hide Token';
+                
+                // Populate scopes in modal
+                const scopesContainer = document.getElementById('created-token-scopes');
+                scopesContainer.innerHTML = '';
+                tokenData.scopes.forEach(scope => {
+                    const scopeTag = document.createElement('span');
+                    scopeTag.className = 'scope-tag';
+                    if (scope.includes('admin')) scopeTag.classList.add('admin');
+                    if (scope.includes('read')) scopeTag.classList.add('read');
+                    if (scope === 'api') scopeTag.classList.add('system');
+                    scopeTag.textContent = scope;
+                    scopesContainer.appendChild(scopeTag);
+                });
+
+                showModal('token-success-modal');
+                
+                // Hide create form and reset
+                document.getElementById('create-token-container').style.display = 'none';
+                const button = document.querySelector('#token-management .section-header .btn');
+                if (button) {
+                    button.textContent = '➕ Create New Token';
+                    button.classList.remove('btn-secondary');
+                    button.classList.add('btn-primary');
+                }
+                
+                // Reset form
+                resetForm();
+                
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                // TODO: In real implementation, refresh the token list to show the new token
+            }, 2000);
+        }
+
+        function resetForm() {
+            document.getElementById('create-token-form').reset();
+            document.querySelectorAll('.scope-option').forEach(option => {
+                option.classList.remove('checked');
+            });
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        let tokenVisible = true; // Track token visibility state
+
+        function copyCreatedToken() {
+            const tokenValue = document.getElementById('created-token-value').textContent;
+            const tokenElement = document.getElementById('created-token-value');
+            const btn = document.getElementById('copy-token-btn');
+            
+            navigator.clipboard.writeText(tokenValue).then(() => {
+                const originalText = btn.textContent;
+                const originalClass = btn.className;
+                
+                // Update button
+                btn.textContent = '✅ Copied!';
+                btn.className = 'btn btn-success btn-token-action';
+                
+                // Add visual feedback to token
+                tokenElement.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.className = originalClass;
+                    tokenElement.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = tokenValue;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const btn = document.getElementById('copy-token-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        function toggleTokenVisibility() {
+            const tokenValueElement = document.getElementById('created-token-value');
+            const tokenHiddenElement = document.getElementById('created-token-hidden');
+            const toggleBtn = document.getElementById('toggle-visibility-btn');
+            
+            if (tokenVisible) {
+                // Hide token
+                tokenValueElement.style.display = 'none';
+                tokenHiddenElement.style.display = 'block';
+                toggleBtn.textContent = '👁️ Show Token';
+                toggleBtn.title = 'Click to show token';
+                tokenVisible = false;
+            } else {
+                // Show token
+                tokenValueElement.style.display = 'block';
+                tokenHiddenElement.style.display = 'none';
+                toggleBtn.textContent = '👁️ Hide Token';
+                toggleBtn.title = 'Click to hide token';
+                tokenVisible = true;
+            }
+        }
+
+        // Legacy function for backward compatibility
+        function copyToken() {
+            copyCreatedToken();
+        }
+
+        let detailTokenVisible = true; // Track detail token visibility state
+
+        function copyDetailToken() {
+            const tokenValue = document.getElementById('detail-token-value').textContent;
+            const tokenElement = document.getElementById('detail-token-value');
+            const btn = document.getElementById('copy-detail-token-btn');
+            
+            navigator.clipboard.writeText(tokenValue).then(() => {
+                const originalText = btn.textContent;
+                const originalClass = btn.className;
+                
+                // Update button
+                btn.textContent = '✅ Copied!';
+                btn.className = 'btn btn-success btn-sm';
+                
+                // Add visual feedback to token
+                tokenElement.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.className = originalClass;
+                    tokenElement.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = tokenValue;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const btn = document.getElementById('copy-detail-token-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        function toggleDetailTokenVisibility() {
+            const tokenValueElement = document.getElementById('detail-token-value');
+            const tokenHiddenElement = document.getElementById('detail-token-hidden');
+            const toggleBtn = document.getElementById('toggle-detail-visibility-btn');
+            
+            if (detailTokenVisible) {
+                // Hide token
+                tokenValueElement.style.display = 'none';
+                tokenHiddenElement.style.display = 'block';
+                toggleBtn.textContent = '👁️ Show Token';
+                toggleBtn.title = 'Click to show token';
+                detailTokenVisible = false;
+            } else {
+                // Show token
+                tokenValueElement.style.display = 'block';
+                tokenHiddenElement.style.display = 'none';
+                toggleBtn.textContent = '👁️ Hide Token';
+                toggleBtn.title = 'Click to hide token';
+                detailTokenVisible = true;
+            }
+        }
+
+        function toggleCreateToken() {
+            console.log('toggleCreateToken called');
+            const container = document.getElementById('create-token-container');
+            const button = document.querySelector('#token-management .section-header .btn');
+            
+            if (!container) {
+                console.error('Create token container not found');
+                return;
+            }
+            
+            // Check if container is hidden (either display: none or not visible)
+            const isHidden = container.style.display === 'none' || 
+                           window.getComputedStyle(container).display === 'none';
+            
+            console.log('Container is hidden:', isHidden);
+            
+            if (isHidden) {
+                // Show the form
+                container.style.display = 'block';
+                if (button) {
+                    button.textContent = '❌ Cancel';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-secondary');
+                }
+                // Scroll to the form with a small delay to ensure it's rendered
+                setTimeout(() => {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            } else {
+                // Hide the form
+                container.style.display = 'none';
+                if (button) {
+                    button.textContent = '➕ Create New Token';
+                    button.classList.remove('btn-secondary');
+                    button.classList.add('btn-primary');
+                }
+                // Reset form when hiding
+                resetForm();
+            }
+        }
+
+        function showCreateTokenModal() {
+            // Switch to token management section and show create form
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            
+            document.querySelector('[data-section="token-management"]').classList.add('active');
+            document.getElementById('token-management').classList.add('active');
+            
+            // Show the create token form
+            const container = document.getElementById('create-token-container');
+            if (container.style.display === 'none') {
+                toggleCreateToken();
+            }
+        }
+
+        function showTokenDetails(tokenId) {
+            // Sample token data - in real implementation, this would fetch from API
+            const tokenData = {
+                'token1': {
+                    name: 'API Integration Token',
+                    value: 'dims_token_abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567',
+                    created: 'Jan 15, 2024 10:30 AM',
+                    lastUsed: '2 hours ago',
+                    expires: 'Apr 15, 2024',
+                    status: 'active',
+                    scopes: ['read_api', 'agent_conversation', 'llm_access']
+                },
+                'token2': {
+                    name: 'Development Token',
+                    value: 'dims_token_dev789xyz456abc123def890ghi567jkl234mno901pqr678stu345',
+                    created: 'Jan 10, 2024 9:15 AM',
+                    lastUsed: '1 day ago',
+                    expires: 'Jul 10, 2024',
+                    status: 'active',
+                    scopes: ['agent_admin', 'document_admin', 'read_api']
+                },
+                'token3': {
+                    name: 'Temporary Access',
+                    value: null, // Expired tokens don't show values
+                    created: 'Jan 5, 2024 2:00 PM',
+                    lastUsed: 'Jan 14, 2024',
+                    expires: 'Jan 14, 2024',
+                    status: 'expired',
+                    scopes: ['document_read', 'work_item_download']
+                }
+            };
+
+            const token = tokenData[tokenId];
+            if (!token) return;
+
+            // Populate modal with token data
+            document.getElementById('detail-token-name').textContent = token.name;
+            document.getElementById('detail-token-created').textContent = token.created;
+            document.getElementById('detail-token-last-used').textContent = token.lastUsed;
+            document.getElementById('detail-token-expires').textContent = token.expires;
+            
+            // Update status badge
+            const statusElement = document.getElementById('detail-token-status');
+            statusElement.textContent = token.status.charAt(0).toUpperCase() + token.status.slice(1);
+            statusElement.className = `status-badge status-${token.status}`;
+
+            // Show/hide token value section based on status
+            const tokenValueSection = document.getElementById('detail-token-value-section');
+            if (token.status === 'active' && token.value) {
+                tokenValueSection.style.display = 'block';
+                document.getElementById('detail-token-value').textContent = token.value;
+                
+                // Reset visibility state
+                detailTokenVisible = true;
+                document.getElementById('detail-token-value').style.display = 'block';
+                document.getElementById('detail-token-hidden').style.display = 'none';
+                document.getElementById('toggle-detail-visibility-btn').textContent = '👁️ Hide Token';
+            } else {
+                tokenValueSection.style.display = 'none';
+            }
+
+            // Populate scopes
+            const scopesContainer = document.getElementById('detail-token-scopes');
+            scopesContainer.innerHTML = '';
+            token.scopes.forEach(scope => {
+                const scopeTag = document.createElement('span');
+                scopeTag.className = 'scope-tag';
+                if (scope.includes('admin')) scopeTag.classList.add('admin');
+                if (scope.includes('read')) scopeTag.classList.add('read');
+                if (scope === 'api') scopeTag.classList.add('system');
+                scopeTag.textContent = scope;
+                scopesContainer.appendChild(scopeTag);
+            });
+
+            showModal('token-details-modal');
+        }
+
+        function revokeToken(tokenId) {
+            if (confirm('Are you sure you want to revoke this token? This action cannot be undone.')) {
+                // Simulate API call
+                alert('Token revoked successfully.');
+                // In real implementation, refresh the token list
+            }
+        }
+
+        function deleteToken(tokenId) {
+            if (confirm('Are you sure you want to delete this expired token?')) {
+                // Simulate API call
+                alert('Token deleted successfully.');
+                // In real implementation, refresh the token list
+            }
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Role Management Functions
+        const ROLE_SCOPES = {
+            admin: [
+                'agent_admin', 'document_admin', 'action_package_admin', 'conversation_admin',
+                'runbook_admin', 'work_item_admin', 'llm_access', 'llm_streaming',
+                'document_processing', 'document_upload', 'document_intelligence',
+                'agent_execution', 'read_api', 'system_health', 'token_self_manage'
+            ],
+            user: [
+                'read_api', 'agent_conversation', 'conversation_participate', 'ai_agent_chat',
+                'llm_access', 'document_processing', 'document_upload', 'work_item_download',
+                'work_item_read', 'agent_read', 'document_read', 'conversation_read',
+                'action_package_read', 'runbook_read', 'system_health', 'token_self_manage'
+            ]
+        };
+
+        const SCOPE_DEFINITIONS = {
+            // Core API
+            'read_api': { category: 'Core API', title: 'Read API', description: 'Read-only access to all API endpoints', type: 'read' },
+            'api': { category: 'Core API', title: 'Full API Access', description: 'Complete access to all API functionality', type: 'system' },
+            
+            // Agent Management
+            'agent_read': { category: 'Agent Management', title: 'View Agents', description: 'Read-only access to agent information', type: 'read' },
+            'agent_admin': { category: 'Agent Management', title: 'Manage Agents', description: 'Full administrative access to agents', type: 'admin' },
+            'agent_conversation': { category: 'Agent Management', title: 'Chat with Agents', description: 'Ability to interact with AI agents', type: 'normal' },
+            'agent_execution': { category: 'Agent Management', title: 'Execute Workflows', description: 'Permission to execute agent workflows', type: 'normal' },
+            
+            // Document Processing
+            'document_read': { category: 'Document Processing', title: 'View Documents', description: 'Read-only access to documents', type: 'read' },
+            'document_admin': { category: 'Document Processing', title: 'Manage Documents', description: 'Full administrative access to documents', type: 'admin' },
+            'document_processing': { category: 'Document Processing', title: 'Process Documents', description: 'Permission to trigger document processing', type: 'normal' },
+            'document_upload': { category: 'Document Processing', title: 'Upload Files', description: 'Ability to upload documents and files', type: 'normal' },
+            'document_intelligence': { category: 'Document Processing', title: 'Document Intelligence', description: 'Access to AI-powered document analysis', type: 'normal' },
+            
+            // LLM & AI
+            'llm_access': { category: 'AI & LLM', title: 'LLM Services', description: 'Access to language model services', type: 'normal' },
+            'llm_streaming': { category: 'AI & LLM', title: 'Streaming Responses', description: 'Permission to use streaming LLM services', type: 'normal' },
+            'ai_agent_chat': { category: 'AI & LLM', title: 'AI Agent Chat', description: 'Specialized access to conversational AI agents', type: 'normal' },
+            
+            // Conversations
+            'conversation_read': { category: 'Conversations', title: 'View Conversations', description: 'Read-only access to conversation data', type: 'read' },
+            'conversation_admin': { category: 'Conversations', title: 'Manage Conversations', description: 'Full access to conversation management', type: 'admin' },
+            'conversation_participate': { category: 'Conversations', title: 'Participate in Conversations', description: 'Permission to participate in conversations', type: 'normal' },
+            
+            // Action Packages
+            'action_package_read': { category: 'Action Packages', title: 'View Action Packages', description: 'Read-only access to action packages', type: 'read' },
+            'action_package_admin': { category: 'Action Packages', title: 'Manage Action Packages', description: 'Full administrative access to action packages', type: 'admin' },
+            'action_package_execution': { category: 'Action Packages', title: 'Execute Action Packages', description: 'Permission to execute action packages', type: 'normal' },
+            
+            // Runbooks
+            'runbook_read': { category: 'Runbooks', title: 'View Runbooks', description: 'Read-only access to runbooks', type: 'read' },
+            'runbook_admin': { category: 'Runbooks', title: 'Manage Runbooks', description: 'Full administrative access to runbooks', type: 'admin' },
+            'runbook_execution': { category: 'Runbooks', title: 'Execute Runbooks', description: 'Permission to execute runbooks', type: 'normal' },
+            
+            // Work Items
+            'work_item_read': { category: 'Work Items', title: 'View Work Items', description: 'Read-only access to work items', type: 'read' },
+            'work_item_admin': { category: 'Work Items', title: 'Manage Work Items', description: 'Full access to work item management', type: 'admin' },
+            'work_item_download': { category: 'Work Items', title: 'Download Work Items', description: 'Permission to download work item files', type: 'normal' },
+            
+            // System
+            'system_health': { category: 'System', title: 'System Health', description: 'Access to system health and monitoring', type: 'normal' },
+            'token_self_manage': { category: 'System', title: 'Manage Own Tokens', description: 'Permission to manage personal tokens', type: 'normal' },
+            'token_admin': { category: 'System', title: 'Token Administration', description: 'Administrative access to all tokens', type: 'admin' }
+        };
+
+        function isCurrentUserOwner() {
+            const roleBadge = document.querySelector('.role-badge');
+            return roleBadge && roleBadge.textContent.trim() === 'Owner';
+        }
+
+        // Custom roles storage
+        let CUSTOM_ROLES = {};
+
+        function showRoleEditButtons() {
+            if (isCurrentUserOwner()) {
+                document.querySelectorAll('.edit-role-btn').forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                });
+                // Show create custom role button
+                const createRoleBtn = document.querySelector('#role-management-actions .btn');
+                if (createRoleBtn) {
+                    createRoleBtn.style.display = 'inline-flex';
+                }
+                // Show user management invite button
+                const inviteUserBtn = document.querySelector('.user-management-actions .btn');
+                if (inviteUserBtn) {
+                    inviteUserBtn.style.display = 'inline-flex';
+                }
+            }
+        }
+
+        function toggleRoleEdit(roleName) {
+            const roleSection = document.querySelector(`[data-role="${roleName}"]`);
+            const displayDiv = roleSection.querySelector('.role-scope-display');
+            const editorDiv = roleSection.querySelector('.role-scope-editor');
+            const editBtn = roleSection.querySelector('.edit-role-btn');
+            const saveBtn = roleSection.querySelector('.save-role-btn');
+            const cancelBtn = roleSection.querySelector('.cancel-role-btn');
+            
+            if (editorDiv.style.display === 'none') {
+                // Switch to edit mode
+                displayDiv.style.display = 'none';
+                editorDiv.style.display = 'block';
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-flex';
+                cancelBtn.style.display = 'inline-flex';
+                
+                // Populate the editor
+                populateRoleEditor(roleName);
+            } else {
+                // Switch back to display mode
+                cancelRoleEdit(roleName);
+            }
+        }
+
+        function populateRoleEditor(roleName) {
+            const editorDiv = document.getElementById(`${roleName}-scope-editor`);
+            const currentScopes = ROLE_SCOPES[roleName] || [];
+            
+            // Group scopes by category
+            const scopesByCategory = {};
+            Object.keys(SCOPE_DEFINITIONS).forEach(scopeId => {
+                const scope = SCOPE_DEFINITIONS[scopeId];
+                if (!scopesByCategory[scope.category]) {
+                    scopesByCategory[scope.category] = [];
+                }
+                scopesByCategory[scope.category].push({
+                    id: scopeId,
+                    ...scope
+                });
+            });
+            
+            let editorHTML = '<h5 style="margin-bottom: 15px;">Edit Role Scopes</h5>';
+            
+            Object.keys(scopesByCategory).forEach(category => {
+                editorHTML += `
+                    <div class="scope-editor-category">
+                        <div class="scope-editor-category-title">${category}</div>
+                        <div class="scope-editor-grid">
+                `;
+                
+                scopesByCategory[category].forEach(scope => {
+                    const isChecked = currentScopes.includes(scope.id);
+                    const scopeClass = scope.type === 'admin' ? 'admin' : scope.type === 'read' ? 'read' : scope.type === 'system' ? 'system' : '';
+                    
+                    editorHTML += `
+                        <label class="scope-editor-item ${isChecked ? 'selected' : ''}" data-scope="${scope.id}">
+                            <input type="checkbox" name="role-scopes" value="${scope.id}" ${isChecked ? 'checked' : ''}>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 2px;">${scope.title}</div>
+                                <div style="font-size: 0.8rem; color: #6c757d;">${scope.description}</div>
+                                <span class="scope-badge ${scopeClass}" style="margin-top: 4px;">${scope.id}</span>
+                            </div>
+                        </label>
+                    `;
+                });
+                
+                editorHTML += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            editorDiv.innerHTML = editorHTML;
+            
+            // Add event listeners for the checkboxes
+            editorDiv.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const item = this.closest('.scope-editor-item');
+                    if (this.checked) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            });
+            
+            // Make entire items clickable
+            editorDiv.querySelectorAll('.scope-editor-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        e.preventDefault();
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            
+                            // Trigger both change and click events to ensure all handlers fire
+                            const changeEvent = new Event('change', { bubbles: true });
+                            const clickEvent = new Event('click', { bubbles: true });
+                            checkbox.dispatchEvent(changeEvent);
+                            checkbox.dispatchEvent(clickEvent);
+                        }
+                    }
+                });
+            });
+        }
+
+        function saveRoleScopes(roleName) {
+            const editorDiv = document.getElementById(`${roleName}-scope-editor`);
+            const selectedScopes = Array.from(editorDiv.querySelectorAll('input[name="role-scopes"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            // Update the role scopes in memory
+            ROLE_SCOPES[roleName] = selectedScopes;
+            
+            // Update the display
+            updateRoleDisplay(roleName, selectedScopes);
+            
+            // Switch back to display mode
+            cancelRoleEdit(roleName);
+            
+            // Show success message
+            alert(`✅ ${roleName.charAt(0).toUpperCase() + roleName.slice(1)} role scopes updated successfully!`);
+            
+            // TODO: In real implementation, send API request to save changes
+            console.log(`Saving role ${roleName} with scopes:`, selectedScopes);
+        }
+
+        function updateRoleDisplay(roleName, scopes) {
+            const displayDiv = document.getElementById(`${roleName}-scope-display`);
+            const scopeTagsDiv = displayDiv.querySelector('.scope-tags');
+            
+            let tagsHTML = '';
+            scopes.forEach(scopeId => {
+                const scope = SCOPE_DEFINITIONS[scopeId];
+                if (scope) {
+                    const scopeClass = scope.type === 'admin' ? 'admin' : scope.type === 'read' ? 'read' : scope.type === 'system' ? 'system' : '';
+                    tagsHTML += `<span class="scope-tag ${scopeClass}">${scopeId}</span>`;
+                }
+            });
+            
+            scopeTagsDiv.innerHTML = tagsHTML;
+        }
+
+        function cancelRoleEdit(roleName) {
+            const roleSection = document.querySelector(`[data-role="${roleName}"]`);
+            const displayDiv = roleSection.querySelector('.role-scope-display');
+            const editorDiv = roleSection.querySelector('.role-scope-editor');
+            const editBtn = roleSection.querySelector('.edit-role-btn');
+            const saveBtn = roleSection.querySelector('.save-role-btn');
+            const cancelBtn = roleSection.querySelector('.cancel-role-btn');
+            
+            displayDiv.style.display = 'block';
+            editorDiv.style.display = 'none';
+            editBtn.style.display = 'inline-flex';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Token Management UI initialized');
+            
+            // Ensure create token form is hidden on load
+            const container = document.getElementById('create-token-container');
+            if (container) {
+                container.style.display = 'none';
+            }
+            
+            // Ensure main button is in correct state
+            const button = document.querySelector('#token-management .section-header .btn');
+            if (button) {
+                button.textContent = '➕ Create New Token';
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary');
+            }
+            
+            // Show role edit buttons if user is Owner
+            showRoleEditButtons();
+
+            // Handle custom role form submission
+            const createRoleForm = document.getElementById('create-role-form');
+            if (createRoleForm) {
+                createRoleForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    createCustomRole();
+                });
+            }
+
+            // Initialize user management
+            initializeUserManagement();
+            initializeUserForms();
+        });
+
+        // Custom Role Management Functions
+        function showCreateRoleModal() {
+            populateCustomRoleScopeSelector();
+            showModal('create-role-modal');
+        }
+
+        function populateCustomRoleScopeSelector() {
+            const selectorDiv = document.getElementById('custom-role-scope-selector');
+            
+            // Add help text
+            let selectorHTML = `
+                <div class="role-creation-help">
+                    <strong>💡 Tip:</strong> Select the specific permissions this role should have. You can combine scopes from different categories to create specialized roles like "Document Specialist" or "AI Operator".
+                </div>
+            `;
+
+            // Group scopes by category (reuse existing logic)
+            const scopesByCategory = {};
+            Object.keys(SCOPE_DEFINITIONS).forEach(scopeId => {
+                const scope = SCOPE_DEFINITIONS[scopeId];
+                if (!scopesByCategory[scope.category]) {
+                    scopesByCategory[scope.category] = [];
+                }
+                scopesByCategory[scope.category].push({
+                    id: scopeId,
+                    ...scope
+                });
+            });
+
+            Object.keys(scopesByCategory).forEach(category => {
+                selectorHTML += `
+                    <div class="scope-category">
+                        <div class="scope-category-title">🔸 ${category}</div>
+                        <div class="scope-options">
+                `;
+                
+                scopesByCategory[category].forEach(scope => {
+                    const scopeClass = scope.type === 'admin' ? 'admin' : scope.type === 'read' ? 'read' : scope.type === 'system' ? 'system' : '';
+                    
+                    selectorHTML += `
+                        <label class="scope-option">
+                            <div class="scope-card">
+                                <input type="checkbox" name="custom-role-scopes" value="${scope.id}" class="scope-checkbox">
+                                <div class="scope-content">
+                                    <div class="scope-title">${scope.title}</div>
+                                    <div class="scope-description">${scope.description}</div>
+                                    <span class="scope-badge ${scopeClass}">${scope.id}</span>
+                                </div>
+                            </div>
+                        </label>
+                    `;
+                });
+                
+                selectorHTML += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Add scope selection summary
+            selectorHTML += `
+                <div class="scope-selection-summary" id="scope-selection-summary" style="display: none;">
+                    <div class="selected-scopes-count">Selected Scopes: <span id="selected-count">0</span></div>
+                    <div id="selected-scopes-preview"></div>
+                </div>
+            `;
+
+            selectorDiv.innerHTML = selectorHTML;
+
+            // Add event listeners for scope selection
+            selectorDiv.querySelectorAll('input[name="custom-role-scopes"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const option = this.closest('.scope-option');
+                    if (this.checked) {
+                        option.classList.add('checked');
+                    } else {
+                        option.classList.remove('checked');
+                    }
+                    updateScopeSelectionSummary();
+                });
+            });
+
+            // Make entire scope cards clickable
+            selectorDiv.querySelectorAll('.scope-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        e.preventDefault();
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            
+                            // Trigger both change and click events to ensure all handlers fire
+                            const changeEvent = new Event('change', { bubbles: true });
+                            const clickEvent = new Event('click', { bubbles: true });
+                            checkbox.dispatchEvent(changeEvent);
+                            checkbox.dispatchEvent(clickEvent);
+                        }
+                    }
+                });
+            });
+        }
+
+        function updateScopeSelectionSummary() {
+            const selectedCheckboxes = document.querySelectorAll('input[name="custom-role-scopes"]:checked');
+            const summaryDiv = document.getElementById('scope-selection-summary');
+            const countSpan = document.getElementById('selected-count');
+            const previewDiv = document.getElementById('selected-scopes-preview');
+
+            const selectedCount = selectedCheckboxes.length;
+            countSpan.textContent = selectedCount;
+
+            if (selectedCount > 0) {
+                summaryDiv.style.display = 'block';
+                
+                let previewHTML = '';
+                selectedCheckboxes.forEach(checkbox => {
+                    const scope = SCOPE_DEFINITIONS[checkbox.value];
+                    if (scope) {
+                        const scopeClass = scope.type === 'admin' ? 'admin' : scope.type === 'read' ? 'read' : scope.type === 'system' ? 'system' : '';
+                        previewHTML += `<span class="scope-tag ${scopeClass}" style="margin: 2px;">${checkbox.value}</span>`;
+                    }
+                });
+                previewDiv.innerHTML = previewHTML;
+            } else {
+                summaryDiv.style.display = 'none';
+            }
+        }
+
+        // Handle custom role form submission (will be added to main DOMContentLoaded)
+
+        function createCustomRole() {
+            const roleName = document.getElementById('custom-role-name').value.trim();
+            const roleDescription = document.getElementById('custom-role-description').value.trim();
+            const roleIcon = document.getElementById('custom-role-icon').value.trim() || '🔧';
+            const selectedScopes = Array.from(document.querySelectorAll('input[name="custom-role-scopes"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (!roleName || !roleDescription) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            if (selectedScopes.length === 0) {
+                alert('Please select at least one scope for this role.');
+                return;
+            }
+
+            // Generate role ID from name
+            const roleId = roleName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+            // Check if role already exists
+            if (CUSTOM_ROLES[roleId] || ROLE_SCOPES[roleId]) {
+                alert('A role with this name already exists. Please choose a different name.');
+                return;
+            }
+
+            // Create the custom role
+            const customRole = {
+                id: roleId,
+                name: roleName,
+                description: roleDescription,
+                icon: roleIcon,
+                scopes: selectedScopes,
+                created: new Date().toISOString()
+            };
+
+            // Add to storage
+            CUSTOM_ROLES[roleId] = customRole;
+
+            // Add to role scopes for editing functionality
+            ROLE_SCOPES[roleId] = selectedScopes;
+
+            // Render the new role
+            renderCustomRole(customRole);
+
+            // Show custom roles section if hidden
+            const customRolesCard = document.getElementById('custom-roles-card');
+            if (customRolesCard.style.display === 'none') {
+                customRolesCard.style.display = 'block';
+            }
+
+            // Close modal and reset form
+            closeModal('create-role-modal');
+            document.getElementById('create-role-form').reset();
+
+            // Show success message
+            alert(`✅ Custom role "${roleName}" created successfully!`);
+
+            console.log('Created custom role:', customRole);
+        }
+
+        function renderCustomRole(role) {
+            const container = document.getElementById('custom-roles-container');
+            
+            const roleHTML = `
+                <div class="custom-role-section" data-role="${role.id}">
+                    <div class="custom-role-header">
+                        <div class="custom-role-title">
+                            <span class="custom-role-icon">${role.icon}</span>
+                            <div>
+                                <div class="custom-role-name">${role.name}</div>
+                                <span class="custom-role-badge">Custom Role</span>
+                            </div>
+                        </div>
+                        <div class="role-actions">
+                            <button class="btn btn-secondary btn-sm edit-role-btn" onclick="toggleRoleEdit('${role.id}')">
+                                ✏️ Edit Scopes
+                            </button>
+                            <button class="btn btn-success btn-sm save-role-btn" onclick="saveRoleScopes('${role.id}')" style="display: none;">
+                                💾 Save Changes
+                            </button>
+                            <button class="btn btn-secondary btn-sm cancel-role-btn" onclick="cancelRoleEdit('${role.id}')" style="display: none;">
+                                ❌ Cancel
+                            </button>
+                            <button class="delete-role-btn" onclick="deleteCustomRole('${role.id}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 15px; color: #6c757d;">${role.description}</p>
+                    <div class="role-scope-display" id="${role.id}-scope-display">
+                        <div class="scope-tags">
+                            ${role.scopes.map(scopeId => {
+                                const scope = SCOPE_DEFINITIONS[scopeId];
+                                if (scope) {
+                                    const scopeClass = scope.type === 'admin' ? 'admin' : scope.type === 'read' ? 'read' : scope.type === 'system' ? 'system' : '';
+                                    return `<span class="scope-tag ${scopeClass}">${scopeId}</span>`;
+                                }
+                                return `<span class="scope-tag">${scopeId}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                    <div class="role-scope-editor" id="${role.id}-scope-editor" style="display: none;">
+                        <!-- Scope editor will be dynamically populated -->
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', roleHTML);
+        }
+
+        function deleteCustomRole(roleId) {
+            const role = CUSTOM_ROLES[roleId];
+            if (!role) return;
+
+            if (confirm(`Are you sure you want to delete the "${role.name}" role? This action cannot be undone.`)) {
+                // Remove from storage
+                delete CUSTOM_ROLES[roleId];
+                delete ROLE_SCOPES[roleId];
+
+                // Remove from DOM
+                const roleElement = document.querySelector(`[data-role="${roleId}"]`);
+                if (roleElement) {
+                    roleElement.remove();
+                }
+
+                // Hide custom roles section if no custom roles remain
+                if (Object.keys(CUSTOM_ROLES).length === 0) {
+                    document.getElementById('custom-roles-card').style.display = 'none';
+                }
+
+                alert(`✅ Role "${role.name}" deleted successfully.`);
+                console.log('Deleted custom role:', roleId);
+            }
+        }
+
+        // User Management Functions
+        let USERS_DATA = [
+            {
+                id: 'user_1',
+                name: 'John Doe',
+                email: 'john.doe@company.com',
+                role: 'owner',
+                status: 'active',
+                lastSeen: '2 hours ago',
+                joinDate: '2024-01-01',
+                avatar: 'JD'
+            },
+            {
+                id: 'user_2',
+                name: 'Jane Smith',
+                email: 'jane.smith@company.com',
+                role: 'admin',
+                status: 'active',
+                lastSeen: '1 day ago',
+                joinDate: '2024-01-05',
+                avatar: 'JS'
+            },
+            {
+                id: 'user_3',
+                name: 'Bob Wilson',
+                email: 'bob.wilson@company.com',
+                role: 'user',
+                status: 'active',
+                lastSeen: '3 hours ago',
+                joinDate: '2024-01-10',
+                avatar: 'BW'
+            },
+            {
+                id: 'user_4',
+                name: 'Alice Johnson',
+                email: 'alice.johnson@company.com',
+                role: 'admin',
+                status: 'suspended',
+                lastSeen: '1 week ago',
+                joinDate: '2024-01-08',
+                avatar: 'AJ'
+            },
+            {
+                id: 'user_5',
+                name: 'Mike Brown',
+                email: 'mike.brown@company.com',
+                role: 'user',
+                status: 'pending',
+                lastSeen: 'Never',
+                joinDate: '2024-01-14',
+                avatar: 'MB'
+            }
+        ];
+
+        let currentEditingUser = null;
+
+        function initializeUserManagement() {
+            renderUsers(USERS_DATA);
+            populateRoleOptions();
+        }
+
+        function populateRoleOptions() {
+            const inviteRoleSelect = document.getElementById('invite-role');
+            const editRoleSelect = document.getElementById('edit-user-role');
+            
+            // Add custom roles to both selects
+            Object.values(CUSTOM_ROLES).forEach(role => {
+                const option1 = document.createElement('option');
+                option1.value = role.id;
+                option1.textContent = role.name;
+                inviteRoleSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = role.id;
+                option2.textContent = role.name;
+                editRoleSelect.appendChild(option2);
+            });
+        }
+
+        function renderUsers(users) {
+            const container = document.getElementById('users-container');
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="no-users-found">
+                        <div class="icon">👤</div>
+                        <h3>No users found</h3>
+                        <p>No users match your current search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const usersHTML = users.map(user => {
+                const roleClass = Object.keys(CUSTOM_ROLES).includes(user.role) ? 'custom' : user.role;
+                const roleName = Object.keys(CUSTOM_ROLES).includes(user.role) ? 
+                    CUSTOM_ROLES[user.role].name : 
+                    user.role.charAt(0).toUpperCase() + user.role.slice(1);
+
+                return `
+                    <div class="user-card" data-user-id="${user.id}">
+                        <div class="user-info">
+                            <div class="user-avatar">${user.avatar}</div>
+                            <div class="user-details">
+                                <div class="user-name">${user.name}</div>
+                                <div class="user-email">${user.email}</div>
+                                <div class="user-meta">
+                                    <span class="user-role-badge ${roleClass}">${roleName}</span>
+                                    <span class="user-status ${user.status}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span>
+                                    <span class="user-last-seen">Last seen: ${user.lastSeen}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            ${user.role !== 'owner' ? `
+                                <button class="btn btn-secondary btn-sm" onclick="editUser('${user.id}')">✏️ Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser('${user.id}')">🗑️ Delete</button>
+                            ` : `
+                                <span class="user-role-badge owner">System Owner</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = usersHTML;
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('user-search').value.toLowerCase();
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            const filteredUsers = USERS_DATA.filter(user => {
+                const matchesSearch = user.name.toLowerCase().includes(searchTerm) ||
+                                    user.email.toLowerCase().includes(searchTerm) ||
+                                    user.role.toLowerCase().includes(searchTerm);
+                
+                const matchesRole = !roleFilter || 
+                                  user.role === roleFilter || 
+                                  (roleFilter === 'custom' && Object.keys(CUSTOM_ROLES).includes(user.role));
+                
+                const matchesStatus = !statusFilter || user.status === statusFilter;
+
+                return matchesSearch && matchesRole && matchesStatus;
+            });
+
+            renderUsers(filteredUsers);
+        }
+
+        function showInviteUserModal() {
+            populateRoleOptions();
+            showModal('invite-user-modal');
+        }
+
+        function editUser(userId) {
+            const user = USERS_DATA.find(u => u.id === userId);
+            if (!user) return;
+
+            currentEditingUser = user;
+
+            // Populate form
+            document.getElementById('edit-user-name').value = user.name;
+            document.getElementById('edit-user-email').value = user.email;
+            document.getElementById('edit-user-role').value = user.role;
+            document.getElementById('edit-user-status').value = user.status;
+
+            // Show/hide delete button (owners cannot be deleted)
+            const deleteBtn = document.getElementById('delete-user-btn');
+            if (user.role === 'owner') {
+                deleteBtn.style.display = 'none';
+            } else {
+                deleteBtn.style.display = 'inline-flex';
+            }
+
+            populateRoleOptions();
+            showModal('edit-user-modal');
+        }
+
+        function confirmDeleteUser(userId) {
+            const user = USERS_DATA.find(u => u.id === userId);
+            if (!user) return;
+
+            if (user.role === 'owner') {
+                alert('System owners cannot be deleted.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete user "${user.name}"? This action cannot be undone.`)) {
+                deleteUserById(userId);
+            }
+        }
+
+        function deleteUser() {
+            if (currentEditingUser && currentEditingUser.role !== 'owner') {
+                if (confirm(`Are you sure you want to delete user "${currentEditingUser.name}"? This action cannot be undone.`)) {
+                    deleteUserById(currentEditingUser.id);
+                    closeModal('edit-user-modal');
+                }
+            }
+        }
+
+        function deleteUserById(userId) {
+            USERS_DATA = USERS_DATA.filter(u => u.id !== userId);
+            renderUsers(USERS_DATA);
+            alert('User deleted successfully.');
+            console.log('Deleted user:', userId);
+        }
+
+        // Handle form submissions
+        function initializeUserForms() {
+            // Invite user form
+            const inviteForm = document.getElementById('invite-user-form');
+            if (inviteForm) {
+                inviteForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('invite-email').value;
+                    const name = document.getElementById('invite-name').value;
+                    const role = document.getElementById('invite-role').value;
+                    const message = document.getElementById('invite-message').value;
+
+                    // Check if user already exists
+                    if (USERS_DATA.find(u => u.email === email)) {
+                        alert('A user with this email already exists.');
+                        return;
+                    }
+
+                    // Create new user
+                    const newUser = {
+                        id: 'user_' + Date.now(),
+                        name: name,
+                        email: email,
+                        role: role,
+                        status: 'pending',
+                        lastSeen: 'Never',
+                        joinDate: new Date().toISOString().split('T')[0],
+                        avatar: name.split(' ').map(n => n[0]).join('').toUpperCase()
+                    };
+
+                    USERS_DATA.push(newUser);
+                    renderUsers(USERS_DATA);
+                    closeModal('invite-user-modal');
+                    inviteForm.reset();
+
+                    alert(`✅ Invitation sent to ${email} successfully!`);
+                    console.log('Invited user:', newUser);
+                });
+            }
+
+            // Edit user form
+            const editForm = document.getElementById('edit-user-form');
+            if (editForm) {
+                editForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (!currentEditingUser) return;
+
+                    // Update user data
+                    const userIndex = USERS_DATA.findIndex(u => u.id === currentEditingUser.id);
+                    if (userIndex !== -1) {
+                        USERS_DATA[userIndex].name = document.getElementById('edit-user-name').value;
+                        USERS_DATA[userIndex].role = document.getElementById('edit-user-role').value;
+                        USERS_DATA[userIndex].status = document.getElementById('edit-user-status').value;
+                        
+                        // Update avatar
+                        USERS_DATA[userIndex].avatar = USERS_DATA[userIndex].name
+                            .split(' ').map(n => n[0]).join('').toUpperCase();
+                    }
+
+                    renderUsers(USERS_DATA);
+                    closeModal('edit-user-modal');
+                    currentEditingUser = null;
+
+                    alert('✅ User updated successfully!');
+                    console.log('Updated user:', USERS_DATA[userIndex]);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

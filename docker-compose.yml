@@ -1,0 +1,18 @@
+services:
+  app:
+    container_name: t-docagent-ai
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    image: t-docagent-ai:${TAG:-latest}
+    ports:
+      - "8887:8887"
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket
+    environment:
+      - ENV_STATE=${ENV_STATE:-dev}
+      - CA_PATH=${CA_PATH:-}
+      - APP_HOME=/app

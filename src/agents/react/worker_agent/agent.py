@@ -1,0 +1,129 @@
+from typing import Literal
+
+from beanie.operators import In
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolCall, ToolMessage
+from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.types import interrupt
+
+from agents.react.base import BaseChatAgent
+from agents.react.worker_agent.state import WorkerAgentState
+from agents.react.worker_agent.tools import DefaultTools
+from handlers.llm_configuration import LLMConfigurationHandler
+from helpers.llm.chat import LLMService
+from helpers.mcp_client import MCPClient
+from models.agent import Agent
+from models.document_work_item import DocumentWorkItem
+from models.knowledge_base import KnowledgeBase
+from models.runbook import RunBook
+from schemas.knowledge_base import KnowledgeBaseToolView
+from settings.prompts.worker_agent import WORKER_AGENT_MESSAGE_SYSTEM
+from utils.constants import DEFAULT_FUNCTION_INTERRUPT
+from utils.enums import AgentReasoning, DocWorkItemState, ReasoningEffort
+
+
+class WorkerAgent(BaseChatAgent):
+    def __init__(self, conv_id: str, agent_config: Agent) -> None:
+        super().__init__(conv_id, agent_config)
+        self.instruction_prompt = WORKER_AGENT_MESSAGE_SYSTEM
+        self.agent_state = WorkerAgentState
+        self.kb_names = agent_config.advanced_options.kb_names
+
+    async def _init_agent_properties(self) -> bool:
+        agent_db = self.agent_db
+        rb_db = await RunBook.find_one(
+            RunBook.name == agent_db.run_book.name,
+            RunBook.version == agent_db.run_book.version,
+        )
+        if rb_db is None:
+            self.logger.error(
+                'event=initialize-worker-agent-failed message="Fetch runbook for agent with name %s and version %s not found."',
+                agent_db.run_book.name,
+                agent_db.run_book.version,
+            )
+            return False
+        self.run_book = rb_db.prompt
+
+        owner_config = await LLMConfigurationHandler.get_owner_llm_config()
+        llm_params = self._prepare_llm_creation_params(agent_db.model, owner_config)
+
+        self.llm = LLMService(
+            llm=llm_params.pop("llm_name"),
+            include_thoughts=agent_db.advanced_options.reasoning != AgentReasoning.DISABLED,
+            effort=ReasoningEffort.MEDIUM,
+        ).create_llm(**llm_params)
+
+        if self.llm is None:
+            return False
+
+        kb_dbs = await KnowledgeBase.find(
+            In(KnowledgeBase.name, self.agent_db.advanced_options.kb_names),
+            projection_model=KnowledgeBaseToolView,
+        ).to_list()
+
+        default_tools = DefaultTools(conv_id=self.conv_id, kb_dicts=[kb.model_dump() for kb in kb_dbs])
+        await default_tools._get_conversation_by_id()
+        self.tools = default_tools.tools
+        action_tools = await MCPClient().get_tools_from_agent_config(
+            action_packages=self.agent_db.action_packages,
+        )
+        self.tools.extend(action_tools)
+        self.llm_with_tools = self.llm.bind_tools(self.tools)
+        self.tools_by_name = {tool.name: tool for tool in self.tools}
+        return True
+
+    def build_workflow(self, conv_id: str | None = None) -> StateGraph:
+        conv_id = conv_id or self.conv_id
+        workflow = StateGraph(WorkerAgentState)
+        workflow.add_node("chat_node", self.chat_node)
+        workflow.add_node("tools", self.call_tool)
+        workflow.add_node("ask_human", self.ask_human)
+        workflow.add_edge(START, "chat_node")
+        workflow.add_conditional_edges(
+            "chat_node",
+            self.should_continue,
+            path_map=["ask_human", "tools", END],
+        )
+        workflow.add_edge("ask_human", "chat_node")
+        return workflow
+
+    async def ask_human(self, state: MessagesState) -> dict:
+        last_message = state["messages"][-1]
+        new_msg: list[BaseMessage] = []
+        if isinstance(last_message, AIMessage):
+            tool_call = last_message.tool_calls[0]
+            human_resp = interrupt(tool_call["args"])
+            new_msg.extend(
+                [
+                    ToolMessage(
+                        content=human_resp["data"],
+                        name=tool_call["name"],
+                        tool_call_id=tool_call["id"],
+                    ),
+                    HumanMessage(content=human_resp["data"]),
+                ],
+            )
+            await self._init_conversation(self.conv_db.id)
+            self.conv_db.user_collaboration.hitl = False
+            self.conv_db.user_collaboration.reason = ""
+            dwi_db = await DocumentWorkItem.get(self.conv_db.dwi_id)
+            dwi_db.state = DocWorkItemState.IN_PROCESS
+            await dwi_db.save()
+            await self.conv_db.save()
+        return {"messages": new_msg}
+
+    async def should_continue(self, state: MessagesState) -> Literal["ask_human", "tools", "__end__"]:
+        messages = state.get("messages", [])
+        last_message = messages[-1]
+        if not last_message.tool_calls:
+            return END
+        if last_message.tool_calls[0]["name"] == DEFAULT_FUNCTION_INTERRUPT:
+            tool_call: ToolCall = last_message.tool_calls[0]
+            await self._init_conversation(self.conv_db.id)
+            self.conv_db.user_collaboration.hitl = True
+            self.conv_db.user_collaboration.reason = tool_call["args"]["collaboration_msg"]
+            dwi_db = await DocumentWorkItem.get(self.conv_db.dwi_id)
+            dwi_db.state = DocWorkItemState.USER_COLLABORATION_NEEDED
+            await dwi_db.save()
+            await self.conv_db.save()
+            return "ask_human"
+        return "tools"

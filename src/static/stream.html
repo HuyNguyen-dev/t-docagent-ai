@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Streaming Client with EventSource</title>
+</head>
+<body>
+    <h1>Streaming Events</h1>
+    <div id="output" style="white-space: pre-wrap; font-family: monospace;"></div>
+    <button onclick="stopStream()">Stop Stream</button>
+
+    <script>
+        let eventSource = null;
+
+        function startStream() {
+            const kb_id = "kb-407ce65a-f2e2-468f-bdeb-0948415071cb";
+            const doc_id = "kb_doc-d43b7238-d9ed-4bff-8a5f-40686330b119";
+            const url = `http://11.11.7.226:8881/api/v1/knowledge-base/datasets/${kb_id}/events/stream`;
+            eventSource = new EventSource(url);
+
+            eventSource.onmessage = function(event) {
+                console.log("Event received:", event.data);
+                document.getElementById("output").textContent += event.data + "\n";
+            };
+
+            eventSource.onerror = function(event) {
+                console.error("EventSource error:", event);
+            };
+        }
+
+        function stopStream() {
+            if (eventSource) {
+                eventSource.close();
+                console.log("Stream stopped by user.");
+            }
+        }
+
+        // Start on page load
+        window.onload = startStream;
+    </script>
+</body>
+</html>

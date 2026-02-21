@@ -1,0 +1,4040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@300..800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <title>DIMS-AI Token Management</title>
+    <style>
+        :root {
+            /* shadcn/ui CSS Variables */
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 222.2 47.4% 11.2%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 210 40% 96%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222.2 47.4% 11.2%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 222.2 84% 4.9%;
+            --radius: 0.5rem;
+            --warning: 38 92% 50%;
+            --warning-foreground: 48 96% 89%;
+            --warning-border: 38 92% 50%;
+            --success: 142 76% 36%;
+            --success-foreground: 355 100% 97%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        /* Onboarding and Login Specific Styles */
+        .onboarding-container {
+            max-width: 500px;
+            margin: 10vh auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .onboarding-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .onboarding-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .onboarding-header p {
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        .onboarding-content {
+            padding: 32px 24px;
+        }
+
+        .onboarding-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            border-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .password-requirements {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .password-requirements ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .password-requirements li {
+            margin: 5px 0;
+        }
+
+        .password-requirements li.valid {
+            color: #28a745;
+        }
+
+        .password-requirements li.invalid {
+            color: #dc3545;
+        }
+
+        /* Main app styles */
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 24px 32px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 140px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #64748b;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .sidebar-nav a:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .sidebar-nav a.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .sidebar-nav .icon {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            background: #f8fafc;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        /* Top-right user card styles */
+        .header-user-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* License Warning Panel Styles - Tailwind Colors */
+        .license-warning-panel {
+            position: relative;
+            background: #fefce8; /* bg-yellow-50 */
+            border: 1px solid #fde047; /* border-yellow-200 */
+            border-radius: calc(var(--radius) - 2px);
+            padding: 12px 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            animation: licenseWarningPulse 2s ease-in-out infinite;
+            min-width: 280px;
+            max-width: 320px;
+        }
+
+        @keyframes licenseWarningPulse {
+            0%, 100% { 
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                transform: scale(1.02);
+            }
+        }
+
+        .license-warning-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .license-warning-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            color: #92400e; /* text-yellow-800 */
+        }
+
+        .license-warning-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .license-warning-title {
+            font-weight: 600;
+            color: #92400e; /* text-yellow-800 */
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .license-warning-days {
+            font-weight: 500;
+            color: #a16207; /* text-yellow-700 for slightly lighter */
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+
+        .license-warning-action {
+            background: #92400e; /* text-yellow-800 */
+            color: #fefce8; /* bg-yellow-50 */
+            border: none;
+            padding: 6px 12px;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .license-warning-action:hover {
+            background: #a16207; /* text-yellow-700 for hover */
+            transform: translateY(-1px);
+        }
+
+        .license-action-icon {
+            width: 12px;
+            height: 12px;
+        }
+
+        .license-warning-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #a16207; /* text-yellow-700 for close button */
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: calc(var(--radius) - 2px);
+            transition: all 0.2s ease;
+        }
+
+        .license-warning-close:hover {
+            background: rgba(146, 64, 14, 0.1); /* yellow-800 with opacity */
+            color: #92400e; /* text-yellow-800 */
+        }
+
+        .license-warning-close i {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* About Section Styles - Table Layout */
+        .about-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin-top: 24px;
+        }
+
+        .about-section {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius));
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .about-section-title {
+            background: hsl(var(--muted));
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 12px 16px;
+            margin: 0;
+            border-bottom: 1px solid hsl(var(--border));
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .about-info-table {
+            padding: 0;
+        }
+
+        .about-info-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid hsl(var(--border));
+            transition: background-color 0.2s ease;
+        }
+
+        .about-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .about-info-row:hover {
+            background: hsl(var(--accent));
+        }
+
+        .about-info-label {
+            flex: 0 0 200px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: hsl(var(--muted-foreground));
+            margin-right: 16px;
+        }
+
+        .about-info-value {
+            flex: 1;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: hsl(var(--foreground));
+            word-break: break-word;
+        }
+
+        .about-link {
+            color: hsl(var(--primary));
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .about-link:hover {
+            color: hsl(var(--primary) / 0.8);
+            text-decoration: underline;
+        }
+
+        .about-info-value .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .about-info-value .status-active {
+            background: hsl(var(--primary) / 0.1);
+            color: hsl(var(--primary));
+        }
+
+        .about-info-value .status-success {
+            background: hsl(var(--success) / 0.1);
+            color: hsl(var(--success));
+        }
+
+        .about-info-value .status-expired {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+        }
+
+        /* Responsive design for About section */
+        @media (max-width: 768px) {
+            .about-container {
+                gap: 24px;
+            }
+
+            .about-info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 16px;
+            }
+
+            .about-info-label {
+                flex: none;
+                margin-right: 0;
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+
+            .about-info-value {
+                font-size: 0.875rem;
+            }
+        }
+
+        .user-card-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-card-dropdown:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .user-name-compact {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .user-role-compact {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .dropdown-arrow {
+            width: 16px;
+            height: 16px;
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+
+        .user-card-dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .user-dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown-header {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .user-dropdown-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+
+        .user-dropdown-email {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .user-dropdown-role {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .user-dropdown-actions {
+            padding: 8px;
+        }
+
+        .dropdown-action {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            color: #475569;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .dropdown-action:hover {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .dropdown-action.danger:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .dropdown-action-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Old user info header - hide it */
+        .user-info-header {
+            display: none;
+        }
+
+        /* Hide main app initially */
+        .main-app {
+            display: none;
+        }
+
+        .main-app.active {
+            display: block;
+        }
+
+        /* Token success display */
+        .token-success-display {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .token-value-container {
+            margin: 15px 0;
+        }
+
+        .token-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #28a745;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-copy:hover {
+            background: #1e7e34;
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Card styles */
+        .card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        /* Token list styles */
+        .token-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .token-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .token-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .token-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .token-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .token-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .scope-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .scope-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .scope-tag.admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .scope-tag.read {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .scope-tag.system {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #495057;
+        }
+
+        /* Scope selector */
+        .scope-selector {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .scope-category {
+            margin-bottom: 20px;
+        }
+
+        .scope-category-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .scope-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .scope-option {
+            display: block;
+            padding: 0;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scope-option:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+        }
+
+        .scope-option.checked {
+            background: #e3f2fd;
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        .scope-card {
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .scope-checkbox {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .scope-content {
+            flex: 1;
+        }
+
+        .scope-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .scope-description {
+            color: #6c757d;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .scope-badge {
+            display: inline-block;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        .scope-badge.admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .scope-badge.read {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .scope-badge.system {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-section {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fafafa;
+            margin-bottom: 30px;
+        }
+
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .role-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .role-status-badge {
+            background: #6c757d;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-scope-editor {
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            padding: 20px;
+            background: white;
+            margin-top: 15px;
+        }
+
+        .scope-editor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .scope-editor-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .scope-editor-item:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .scope-editor-item.selected {
+            background: #e3f2fd;
+            border-color: #007bff;
+        }
+
+        .scope-editor-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .scope-editor-category {
+            margin-bottom: 20px;
+        }
+
+        .scope-editor-category-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .custom-role-section {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8f9fc;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .custom-role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .custom-role-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-role-icon {
+            font-size: 1.5rem;
+        }
+
+        .custom-role-name {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .custom-role-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .delete-role-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .delete-role-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .role-creation-help {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        .scope-selection-summary {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .selected-scopes-count {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .users-container {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .user-role-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-role-badge.owner {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-role-badge.admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .user-role-badge.user {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .user-role-badge.custom {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .user-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .user-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .user-status.suspended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .user-last-seen {
+            color: #6c757d;
+            font-size: 0.75rem;
+        }
+
+        .user-management-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-section {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .no-users-found {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .no-users-found .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .role-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .role-owner {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .role-user {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .token-display {
+            background: #f8f9fa;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .token-container {
+            margin: 15px 0;
+        }
+
+        .token-value-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .token-value-hidden {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            line-height: 1.4;
+            letter-spacing: 2px;
+            color: #6c757d;
+        }
+
+        .token-actions-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .token-value.copied {
+            border-color: #28a745;
+            background: #d4edda;
+            animation: copySuccess 0.5s ease;
+        }
+
+        @keyframes copySuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-token-action {
+            min-width: 140px;
+            font-weight: 600;
+        }
+
+        .token-visibility-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #6c757d;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .token-management-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .onboarding-container {
+                margin: 5vh auto;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .onboarding-content {
+                padding: 30px 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .header-user-section {
+                align-self: flex-end;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .license-warning-panel {
+                min-width: 240px;
+                max-width: 280px;
+                order: -1; /* Show license warning above user card on mobile */
+            }
+
+            .user-card-dropdown {
+                padding: 6px 12px;
+                gap: 8px;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+
+            .user-name-compact {
+                font-size: 0.8rem;
+                max-width: 120px;
+            }
+
+            .user-role-compact {
+                font-size: 0.7rem;
+            }
+
+            .user-dropdown-menu {
+                min-width: 200px;
+                right: 0;
+                left: auto;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 10px;
+                padding-bottom: 10px;
+            }
+
+            .sidebar-nav li {
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .scope-options {
+                grid-template-columns: 1fr;
+            }
+
+            .scope-card {
+                padding: 12px;
+            }
+
+            .scope-title {
+                font-size: 0.9rem;
+            }
+
+            .scope-description {
+                font-size: 0.8rem;
+            }
+
+            .token-management-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .filter-section {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .user-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .user-info {
+                width: 100%;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .header-text h1 {
+                font-size: 20px;
+            }
+
+            .header-text p {
+                font-size: 14px;
+            }
+
+            .user-info-compact {
+                display: none; /* Hide text on very small screens */
+            }
+
+            .user-card-dropdown {
+                padding: 8px;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Onboarding Screen -->
+    <div id="onboarding-screen" class="onboarding-container">
+        <div class="onboarding-header">
+            <h1>🚀 Welcome to DIMS-AI</h1>
+            <p>Initialize your system with the first owner account</p>
+        </div>
+        <div class="onboarding-content">
+            <div class="alert alert-info">
+                <strong>System Setup Required</strong><br>
+                No owner account found. Please create the initial administrator account to get started.
+            </div>
+
+            <form id="onboarding-form" class="onboarding-form">
+                <div class="form-group">
+                    <label class="form-label" for="owner-email">Email Address</label>
+                    <input type="email" class="form-control" id="owner-email" required 
+                           placeholder="admin@yourcompany.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="owner-name">Full Name</label>
+                    <input type="text" class="form-control" id="owner-name" required 
+                           placeholder="System Administrator">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="owner-password">Password</label>
+                    <input type="password" class="form-control" id="owner-password" required 
+                           placeholder="Enter a secure password">
+                    <div class="password-requirements">
+                        <strong>Password Requirements:</strong>
+                        <ul id="password-requirements">
+                            <li id="req-length">At least 8 characters</li>
+                            <li id="req-uppercase">One uppercase letter</li>
+                            <li id="req-lowercase">One lowercase letter</li>
+                            <li id="req-number">One number</li>
+                            <li id="req-special">One special character</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="owner-password-confirm">Confirm Password</label>
+                    <input type="password" class="form-control" id="owner-password-confirm" required 
+                           placeholder="Confirm your password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="create-owner-btn">
+                    Create Owner Account
+                </button>
+            </form>
+
+            <div class="loading" id="onboarding-loading">
+                <div class="spinner"></div>
+                <p>Creating your owner account...</p>
+            </div>
+
+            <div id="onboarding-success" style="display: none;">
+                <div class="alert alert-success">
+                    <strong>🎉 Success!</strong> Your owner account has been created successfully.
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Next Step:</strong> Please login with your email and password to access the DIMS-AI system.
+                    You can create access tokens for external integrations later in the Token Management section.
+                </div>
+                
+                <div class="token-success-display" style="display: none;">
+                    <h4>Your Initial Access Token</h4>
+                    <p><strong>⚠️ Important:</strong> This is your initial access token. Please copy and save it securely.</p>
+                    
+                    <div class="token-value-container">
+                        <div class="token-value" id="initial-token-value">
+                            <!-- Token will be displayed here -->
+                        </div>
+                        <button class="btn-copy" onclick="copyInitialToken()">📋 Copy Token</button>
+                    </div>
+                    
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: #6c757d;">
+                        You can create additional tokens later in the Token Management section.
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" onclick="proceedToApp()">
+                    Continue to Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="onboarding-container" style="display: none;">
+        <div class="onboarding-header">
+            <h1>🔐 Sign In to DIMS-AI</h1>
+            <p>Enter your credentials to access the system</p>
+        </div>
+        <div class="onboarding-content">
+            <form id="login-form" class="onboarding-form">
+                <div class="form-group">
+                    <label class="form-label" for="login-email">Email Address</label>
+                    <input type="email" class="form-control" id="login-email" required 
+                           placeholder="your.email@company.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="login-password">Password</label>
+                    <input type="password" class="form-control" id="login-password" required 
+                           placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="login-btn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="loading" id="login-loading">
+                <div class="spinner"></div>
+                <p>Signing you in...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app">
+        <div class="container">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <div class="header-icon">🔐</div>
+                        <div class="header-text">
+                            <h1>DIMS-AI Token Management</h1>
+                            <p>Secure access token management with role-based permissions and scope control</p>
+                        </div>
+                    </div>
+                    <div class="header-user-section">
+                        <!-- License Warning Panel -->
+                        <div class="license-warning-panel" id="license-warning-panel" style="display: none;">
+                            <div class="license-warning-content">
+                                <div class="license-warning-icon">
+                                    <i data-lucide="alert-triangle"></i>
+                                </div>
+                                <div class="license-warning-text">
+                                    <div class="license-warning-title">License Expiring Soon</div>
+                                    <div class="license-warning-days" id="license-days-left">30 days left</div>
+                                </div>
+                                <button class="license-warning-action" onclick="handleLicenseWarning()">
+                                    <i data-lucide="refresh-cw" class="license-action-icon"></i>
+                                    Renew
+                                </button>
+                            </div>
+                            <button class="license-warning-close" onclick="dismissLicenseWarning()" title="Dismiss for today">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="user-card-dropdown" id="user-card-dropdown" onclick="toggleUserDropdown()">
+                            <div class="user-avatar" id="user-avatar-header">
+                                <!-- User initials will be set by JavaScript -->
+                            </div>
+                            <div class="user-info-compact">
+                                <div class="user-name-compact" id="user-name-header">Loading...</div>
+                                <div class="user-role-compact" id="user-role-header">Loading...</div>
+                            </div>
+                            <svg class="dropdown-arrow" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="user-dropdown-menu" id="user-dropdown-menu">
+                            <div class="user-dropdown-header">
+                                <div class="user-dropdown-name" id="user-name-dropdown">Loading...</div>
+                                <div class="user-dropdown-email" id="user-email-dropdown">Loading...</div>
+                                <div class="user-dropdown-role" id="user-role-dropdown">Loading...</div>
+                            </div>
+                            <div class="user-dropdown-actions">
+                                <button class="dropdown-action" onclick="showAccountSettings()">
+                                    <svg class="dropdown-action-icon" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Account Settings
+                                </button>
+                                <button class="dropdown-action" onclick="showPreferences()">
+                                    <svg class="dropdown-action-icon" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Preferences
+                                </button>
+                                <button class="dropdown-action danger" onclick="logout()">
+                                    <svg class="dropdown-action-icon" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="sidebar">
+                    <!-- User Info Header -->
+                    <div class="user-info-header">
+                        <div class="user-avatar" id="user-avatar">
+                            <!-- User initials will be set by JavaScript -->
+                        </div>
+                        <div class="user-details">
+                            <h3 id="user-name">Loading...</h3>
+                            <p id="user-email">Loading...</p>
+                            <p id="user-role">Loading...</p>
+                        </div>
+                        <button class="logout-btn" onclick="logout()">
+                            Logout
+                        </button>
+                    </div>
+
+                    <ul class="sidebar-nav">
+                        <li><a href="#" class="nav-link active" data-section="dashboard">
+                            <span class="icon">📊</span> Dashboard
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="token-management">
+                            <span class="icon">🎫</span> Token Management
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="role-management" style="display: none;">
+                            <span class="icon">👥</span> Role Management
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="user-management" style="display: none;">
+                            <span class="icon">👤</span> User Management
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="audit-logs">
+                            <span class="icon">📋</span> Audit Logs
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="about">
+                            <span class="icon">ℹ️</span> About
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="content-area">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard" class="content-section active">
+                        <div class="section-header">
+                            <h2 class="section-title">Dashboard</h2>
+                        </div>
+
+                        <div class="stats-grid" id="dashboard-stats">
+                            <!-- Stats will be populated by JavaScript -->
+                        </div>
+
+                        <div class="alert alert-success">
+                            <strong>🎉 Welcome to DIMS-AI!</strong><br>
+                            Your system is now ready for use. You can manage tokens, users, and roles from this dashboard.
+                        </div>
+                    </div>
+
+                    <!-- Token Management Section -->
+                    <div id="token-management" class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Token Management</h2>
+                            <button class="btn btn-primary" onclick="showCreateTokenModal()">
+                                ➕ Create New Token
+                            </button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">My Access Tokens</div>
+                            <div class="token-list" id="token-list">
+                                <!-- Tokens will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Management Section -->
+                    <div id="role-management" class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Role Management</h2>
+                            <div id="role-management-actions">
+                                <button class="btn btn-primary" onclick="showCreateRoleModal()" style="display: none;">
+                                    ➕ Create Custom Role
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">System Roles & Permissions</div>
+                            
+                            <!-- Owner Role (Non-editable) -->
+                            <div class="role-section" data-role="owner" style="margin-bottom: 30px;">
+                                <div class="role-header">
+                                    <h4 style="color: #2c3e50; margin-bottom: 15px;">👑 Owner</h4>
+                                    <span class="role-status-badge">Protected</span>
+                                </div>
+                                <p style="margin-bottom: 10px; color: #6c757d;">Ultimate system authority with complete access to all functionality. This role cannot be modified.</p>
+                                <div class="scope-tags">
+                                    <span class="scope-tag system">api (Full Access)</span>
+                                </div>
+                            </div>
+
+                            <!-- Admin Role (Editable for Owner) -->
+                            <div class="role-section" data-role="admin" style="margin-bottom: 30px;">
+                                <div class="role-header">
+                                    <h4 style="color: #2c3e50; margin-bottom: 15px;">⚙️ Admin</h4>
+                                    <div class="role-actions">
+                                        <button class="btn btn-secondary btn-sm edit-role-btn" onclick="toggleRoleEdit('admin')" style="display: none;">
+                                            ✏️ Edit Scopes
+                                        </button>
+                                        <button class="btn btn-success btn-sm save-role-btn" onclick="saveRoleScopes('admin')" style="display: none;">
+                                            💾 Save Changes
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm cancel-role-btn" onclick="cancelRoleEdit('admin')" style="display: none;">
+                                            ❌ Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                                <p style="margin-bottom: 10px; color: #6c757d;">Administrative access to manage platform features and content.</p>
+                                <div class="role-scope-display" id="admin-scope-display">
+                                    <div class="scope-tags">
+                                        <span class="scope-tag admin">agent_admin</span>
+                                        <span class="scope-tag admin">document_admin</span>
+                                        <span class="scope-tag admin">action_package_admin</span>
+                                        <span class="scope-tag admin">conversation_admin</span>
+                                        <span class="scope-tag admin">runbook_admin</span>
+                                        <span class="scope-tag admin">work_item_admin</span>
+                                        <span class="scope-tag">llm_access</span>
+                                        <span class="scope-tag">llm_streaming</span>
+                                        <span class="scope-tag">document_processing</span>
+                                        <span class="scope-tag">document_upload</span>
+                                        <span class="scope-tag">document_intelligence</span>
+                                        <span class="scope-tag">agent_execution</span>
+                                        <span class="scope-tag read">read_api</span>
+                                        <span class="scope-tag">system_health</span>
+                                        <span class="scope-tag">token_self_manage</span>
+                                    </div>
+                                </div>
+                                <div class="role-scope-editor" id="admin-scope-editor" style="display: none;">
+                                    <!-- Scope editor will be dynamically populated -->
+                                </div>
+                            </div>
+
+                            <!-- User Role (Editable for Owner) -->
+                            <div class="role-section" data-role="user" style="margin-bottom: 30px;">
+                                <div class="role-header">
+                                    <h4 style="color: #2c3e50; margin-bottom: 15px;">👤 User</h4>
+                                    <div class="role-actions">
+                                        <button class="btn btn-secondary btn-sm edit-role-btn" onclick="toggleRoleEdit('user')" style="display: none;">
+                                            ✏️ Edit Scopes
+                                        </button>
+                                        <button class="btn btn-success btn-sm save-role-btn" onclick="saveRoleScopes('user')" style="display: none;">
+                                            💾 Save Changes
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm cancel-role-btn" onclick="cancelRoleEdit('user')" style="display: none;">
+                                            ❌ Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                                <p style="margin-bottom: 10px; color: #6c757d;">Standard user access for daily operations and AI interactions.</p>
+                                <div class="role-scope-display" id="user-scope-display">
+                                    <div class="scope-tags">
+                                        <span class="scope-tag read">read_api</span>
+                                        <span class="scope-tag">agent_conversation</span>
+                                        <span class="scope-tag">conversation_participate</span>
+                                        <span class="scope-tag">ai_agent_chat</span>
+                                        <span class="scope-tag">llm_access</span>
+                                        <span class="scope-tag">document_processing</span>
+                                        <span class="scope-tag">document_upload</span>
+                                        <span class="scope-tag">work_item_download</span>
+                                        <span class="scope-tag read">work_item_read</span>
+                                        <span class="scope-tag read">agent_read</span>
+                                        <span class="scope-tag read">document_read</span>
+                                        <span class="scope-tag read">conversation_read</span>
+                                        <span class="scope-tag read">action_package_read</span>
+                                        <span class="scope-tag read">runbook_read</span>
+                                        <span class="scope-tag">system_health</span>
+                                        <span class="scope-tag">token_self_manage</span>
+                                    </div>
+                                </div>
+                                <div class="role-scope-editor" id="user-scope-editor" style="display: none;">
+                                    <!-- Scope editor will be dynamically populated -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Custom Roles Section -->
+                        <div class="card" id="custom-roles-card" style="display: none;">
+                            <div class="card-header">Custom Roles</div>
+                            <div id="custom-roles-container">
+                                <!-- Custom roles will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Management Section -->
+                    <div id="user-management" class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">User Management</h2>
+                            <div class="user-management-actions">
+                                <button class="btn btn-primary" onclick="showInviteUserModal()" style="display: none;">
+                                    ➕ Invite User
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- User Statistics -->
+                        <div class="stats-grid" style="margin-bottom: 30px;">
+                            <div class="stat-card">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">8</div>
+                                <div class="stat-label">Active Users</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">3</div>
+                                <div class="stat-label">Pending Invites</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">1</div>
+                                <div class="stat-label">Suspended</div>
+                            </div>
+                        </div>
+
+                        <!-- User Search and Filters -->
+                        <div class="card" style="margin-bottom: 25px;">
+                            <div class="card-header">Search & Filter Users</div>
+                            <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 15px; align-items: end;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Search Users</label>
+                                    <input type="text" class="form-control" id="user-search" placeholder="Search by name, email, or role..." oninput="filterUsers()">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Filter by Role</label>
+                                    <select class="form-control" id="role-filter" onchange="filterUsers()">
+                                        <option value="">All Roles</option>
+                                        <option value="owner">Owner</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="user">User</option>
+                                        <option value="custom">Custom Roles</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Filter by Status</label>
+                                    <select class="form-control" id="status-filter" onchange="filterUsers()">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Users List -->
+                        <div class="card">
+                            <div class="card-header">System Users</div>
+                            <div class="users-container" id="users-container">
+                                <!-- Users will be dynamically populated -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audit Logs Section -->
+                    <div id="audit-logs" class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Audit Logs</h2>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">Token Activity Log</div>
+                            <div style="display: grid; grid-template-columns: 1fr repeat(3, minmax(120px, auto)); gap: 10px; align-items: end; margin-bottom: 15px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Endpoint</label>
+                                    <input type="text" class="form-control" id="audit-filter-endpoint" placeholder="/tokens, /users, ...">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Status Code</label>
+                                    <input type="number" class="form-control" id="audit-filter-status" placeholder="200, 401, 403...">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">From</label>
+                                    <input type="datetime-local" class="form-control" id="audit-filter-from">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">To</label>
+                                    <input type="datetime-local" class="form-control" id="audit-filter-to">
+                                </div>
+                                <div style="grid-column: 1 / -1; display: flex; gap: 10px;">
+                                    <button class="btn btn-secondary btn-sm" onclick="resetAuditFilters()">Reset</button>
+                                    <button class="btn btn-primary btn-sm" onclick="applyAuditFilters()">Apply Filters</button>
+                                </div>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Auth</th>
+                                        <th>User ID</th>
+                                        <th>Token ID</th>
+                                        <th>Endpoint</th>
+                                        <th>Method</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                        <th>Risk</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="audit-logs-body">
+                                </tbody>
+                            </table>
+                            <div id="audit-pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                                <button class="btn btn-secondary btn-sm" id="audit-prev" onclick="changeAuditPage(-1)" disabled>
+                                    ← Previous
+                                </button>
+                                <div id="audit-page-info" style="color: #495057; font-size: 0.875rem; font-weight: 500; text-align: center; flex: 1;">
+                                    Page 1 / 1
+                                </div>
+                                <button class="btn btn-secondary btn-sm" id="audit-next" onclick="changeAuditPage(1)" disabled>
+                                    Next →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About Section -->
+                    <div id="about" class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">About DIMS</h2>
+                        </div>
+
+                        <!-- System & License Information -->
+                        <div class="about-container">
+                            <div class="about-section">
+                                <h3 class="about-section-title">System Information</h3>
+                                <div class="about-info-table">
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Application Name</div>
+                                        <div class="about-info-value" id="app-name">Document Intelligence Multi-Agent System</div>
+                                    </div>
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Version</div>
+                                        <div class="about-info-value" id="app-version">1.0.0</div>
+                                    </div>
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Server Status</div>
+                                        <div class="about-info-value">
+                                            <span class="status-badge status-success" id="server-status">Online</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="about-section">
+                                <h3 class="about-section-title">License Information</h3>
+                                <div class="about-info-table">
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">License Status</div>
+                                        <div class="about-info-value">
+                                            <span class="status-badge status-success" id="license-status">Valid</span>
+                                        </div>
+                                    </div>
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">License Tier</div>
+                                        <div class="about-info-value" id="license-tier">Basic</div>
+                                    </div>
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Customer ID</div>
+                                        <div class="about-info-value" id="customer-id">Loading...</div>
+                                    </div>
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Expiry Date</div>
+                                        <div class="about-info-value" id="license-expiry">Loading...</div>
+                                    </div>
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Days Remaining</div>
+                                        <div class="about-info-value" id="license-days-remaining">Loading...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="about-section">
+                                <h3 class="about-section-title">Support</h3>
+                                <div class="about-info-table">
+                                    <div class="about-info-row">
+                                        <div class="about-info-label">Support Email</div>
+                                        <div class="about-info-value">
+                                            <a href="mailto:dimsagentic@gmail.com" class="about-link">dimsagentic@gmail.com</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Token Modal -->
+    <div id="create-token-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🆕 Create New Access Token</h3>
+                <button class="close-btn" onclick="closeModal('create-token-modal')">&times;</button>
+            </div>
+            <form id="create-token-form">
+                <div class="form-group">
+                    <label class="form-label">Token Name</label>
+                    <input type="text" class="form-control" id="token-name" placeholder="e.g., API Integration Token" required>
+                    <small style="color: #6c757d; margin-top: 5px; display: block;">Choose a descriptive name to identify this token</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea class="form-control" id="token-description" rows="2" placeholder="Describe what this token will be used for..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Expiration</label>
+                    <select class="form-control" id="token-expiration">
+                        <option value="7">7 days</option>
+                        <option value="30">30 days</option>
+                        <option value="90" selected>90 days</option>
+                        <option value="365">1 year</option>
+                        <option value="">Never expires</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Scope Selection</label>
+                    <div class="scope-selector" id="scope-selector">
+                        <!-- Scopes will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">Create Token</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('create-token-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Token Created Success Modal -->
+    <div id="token-success-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🎉 Token Created Successfully!</h3>
+                <button class="close-btn" onclick="closeModal('token-success-modal')">&times;</button>
+            </div>
+            <div class="alert alert-info">
+                <strong>⚠️ Important:</strong> This is the only time you'll see this token. Please copy it now and store it securely.
+            </div>
+            <div class="token-success-display">
+                <p><strong>Token Name:</strong> <span id="created-token-name"></span></p>
+                <div class="token-value-container">
+                    <div class="token-value" id="created-token-value">
+                        <!-- Token will be displayed here -->
+                    </div>
+                    <button class="btn-copy" onclick="copyCreatedToken()">📋 Copy Token</button>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <p><strong>Selected Scopes:</strong></p>
+                <div class="scope-tags" id="created-token-scopes">
+                    <!-- Scopes will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Token Details Modal -->
+    <div id="view-token-modal" class="modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3 class="modal-title">🎫 Token Details</h3>
+                <button class="close-btn" onclick="closeModal('view-token-modal')">&times;</button>
+            </div>
+            <div id="view-token-body">
+                <!-- Filled dynamically -->
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                <button class="btn btn-secondary" onclick="closeModal('view-token-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Role Modal -->
+    <div id="create-role-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">🆕 Create Custom Role</h3>
+                <button class="close-btn" onclick="closeModal('create-role-modal')">&times;</button>
+            </div>
+            <form id="create-role-form">
+                <div class="form-group">
+                    <label class="form-label">Role Name</label>
+                    <input type="text" class="form-control" id="custom-role-name" placeholder="e.g., Document Specialist" required>
+                    <small style="color: #6c757d; margin-top: 5px; display: block;">Choose a descriptive name for this role</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role Description</label>
+                    <textarea class="form-control" id="custom-role-description" rows="3" placeholder="Describe what this role is for and what users can do..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role Icon (Optional)</label>
+                    <input type="text" class="form-control" id="custom-role-icon" placeholder="e.g., 📊 or 🔧" maxlength="2">
+                    <small style="color: #6c757d; margin-top: 5px; display: block;">Add an emoji icon to represent this role</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Scope Selection</label>
+                    <div class="scope-selector" id="custom-role-scope-selector">
+                        <!-- Will be populated with scope options -->
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">Create Role</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('create-role-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invite User Modal -->
+    <div id="invite-user-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">👤 Invite New User</h3>
+                <button class="close-btn" onclick="closeModal('invite-user-modal')">&times;</button>
+            </div>
+            <form id="invite-user-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="invite-email" placeholder="user@company.com" required>
+                    <small style="color: #6c757d; margin-top: 5px; display: block;">The user will receive an invitation email</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="invite-name" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Assign Role</label>
+                    <select class="form-control" id="invite-role" required>
+                        <option value="">Select a role...</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                        <!-- Custom roles will be added dynamically -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Welcome Message (Optional)</label>
+                    <textarea class="form-control" id="invite-message" rows="3" placeholder="Welcome to our team! Please join us on the DIMS-AI platform..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">Send Invitation</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('invite-user-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Edit User</h3>
+                <button class="close-btn" onclick="closeModal('edit-user-modal')">&times;</button>
+            </div>
+            <form id="edit-user-form">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="edit-user-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="edit-user-email" required readonly>
+                    <small style="color: #6c757d; margin-top: 5px; display: block;">Email cannot be changed</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-control" id="edit-user-role" required>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                        <!-- Custom roles will be added dynamically -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" id="edit-user-status" required>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-modal')">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteUser()" id="delete-user-btn">Delete User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Updated for localhost
+        const API_BASE_URL = 'http://localhost:8888/api/v1';
+        let currentUser = null;
+        let accessToken = null;
+        let licenseInfo = null;
+
+        // Available scopes for token creation
+        const AVAILABLE_SCOPES = {
+            'Core API': [
+                { id: 'read_api', title: 'Read API', description: 'Read-only access to all API endpoints', type: 'read' },
+                { id: 'api', title: 'Full API Access', description: 'Complete access to all API functionality', type: 'system' }
+            ],
+            'Agent Management': [
+                { id: 'agent_read', title: 'View Agents', description: 'Read-only access to agent information', type: 'read' },
+                { id: 'agent_admin', title: 'Manage Agents', description: 'Full administrative access to agents', type: 'admin' },
+                { id: 'agent_conversation', title: 'Chat with Agents', description: 'Ability to interact with AI agents', type: 'normal' },
+                { id: 'agent_execution', title: 'Execute Workflows', description: 'Permission to execute agent workflows', type: 'normal' }
+            ],
+            'Document Processing': [
+                { id: 'document_read', title: 'View Documents', description: 'Read-only access to documents', type: 'read' },
+                { id: 'document_admin', title: 'Manage Documents', description: 'Full administrative access to documents', type: 'admin' },
+                { id: 'document_processing', title: 'Process Documents', description: 'Permission to trigger document processing', type: 'normal' },
+                { id: 'document_upload', title: 'Upload Files', description: 'Ability to upload documents and files', type: 'normal' }
+            ],
+            'LLM & AI': [
+                { id: 'llm_access', title: 'LLM Services', description: 'Access to language model services', type: 'normal' },
+                { id: 'llm_streaming', title: 'Streaming Responses', description: 'Permission to use streaming LLM services', type: 'normal' },
+                { id: 'ai_agent_chat', title: 'AI Agent Chat', description: 'Specialized access to conversational AI agents', type: 'normal' }
+            ],
+            'System & Management': [
+                { id: 'system_health', title: 'System Health', description: 'Access to system health and monitoring', type: 'normal' },
+                { id: 'token_self_manage', title: 'Manage Own Tokens', description: 'Permission to manage personal tokens', type: 'normal' },
+                { id: 'token_admin', title: 'Token Administration', description: 'Administrative access to all tokens', type: 'admin' }
+            ]
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            checkSystemStatus();
+        });
+
+        // API Helper function
+        async function apiCall(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            if (accessToken) {
+                defaultOptions.headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+
+            const finalOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            };
+
+
+            
+            try {
+                const response = await fetch(url, finalOptions);
+                
+                let data;
+                try {
+                    data = await response.json();
+                } catch (jsonError) {
+                    // Handle cases where response is not JSON
+                    console.error(`Non-JSON response from ${url}:`, response.status, response.statusText);
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                if (!response.ok) {
+                    const errorMessage = data.detail || data.message || `API Error: ${response.status} ${response.statusText}`;
+                    console.error(`API Error Response from ${url}:`, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        data: data
+                    });
+                    throw new Error(errorMessage);
+                }
+                
+                return data;
+            } catch (error) {
+                if (error instanceof TypeError && error.message.includes('fetch')) {
+                    console.error(`Network error calling ${url}:`, error);
+                    throw new Error('Network error: Unable to connect to the server');
+                } else {
+                    console.error(`API Call failed: ${url}`, error.message);
+                    throw error;
+                }
+            }
+        }
+
+        // Check system initialization status
+        async function checkSystemStatus() {
+            try {
+                const response = await apiCall('/onboarding/status');
+                const data = response.data
+                if (data.requires_onboarding) {
+                    showOnboardingScreen();
+                } else {
+                    const savedToken = localStorage.getItem('dims_access_token');
+                    if (savedToken) {
+                        accessToken = savedToken;
+                        await loadUserContext();
+                    } else {
+                        showLoginScreen();
+                    }
+                }
+            } catch (error) {
+                // Try to proceed with saved token if available
+                const savedToken = localStorage.getItem('dims_access_token');
+                if (savedToken) {
+                    accessToken = savedToken;
+                    try {
+                        await loadUserContext();
+                        return;
+                    } catch (userError) {
+                        localStorage.removeItem('dims_access_token');
+                    }
+                }
+                
+                // Show appropriate error message
+                if (error.message.includes('Network error')) {
+                    showError('Cannot connect to server. Please ensure the DIMS-AI server is running at ' + API_BASE_URL);
+                } else {
+                    showError('System initialization failed: ' + error.message);
+                }
+                
+                // Default to login screen if all else fails
+                setTimeout(() => {
+                    showLoginScreen();
+                }, 3000);
+            }
+        }
+
+        // Show onboarding screen
+        function showOnboardingScreen() {
+            document.getElementById('onboarding-screen').style.display = 'block';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'none';
+        }
+
+        // Show login screen
+        function showLoginScreen() {
+            document.getElementById('onboarding-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('main-app').style.display = 'none';
+        }
+
+        // Show main application
+        function showMainApp() {
+            document.getElementById('onboarding-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+        }
+
+        // Password validation
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            const updateRequirement = (id, isValid) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.className = isValid ? 'valid' : 'invalid';
+                }
+            };
+
+            updateRequirement('req-length', requirements.length);
+            updateRequirement('req-uppercase', requirements.uppercase);
+            updateRequirement('req-lowercase', requirements.lowercase);
+            updateRequirement('req-number', requirements.number);
+            updateRequirement('req-special', requirements.special);
+
+            return Object.values(requirements).every(req => req);
+        }
+
+        // Real-time password validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('owner-password');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    validatePassword(this.value);
+                });
+            }
+        });
+
+        // Handle onboarding form submission
+        document.getElementById('onboarding-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('owner-email').value;
+            const name = document.getElementById('owner-name').value;
+            const password = document.getElementById('owner-password').value;
+            const confirmPassword = document.getElementById('owner-password-confirm').value;
+
+            if (!validatePassword(password)) {
+                showError('Password does not meet the requirements.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match.');
+                return;
+            }
+
+            showLoading('onboarding-loading');
+            
+            try {
+                const data = await apiCall('/onboarding/initialize-owner', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: email,
+                        name: name,
+                        password: password
+                    })
+                });
+
+                hideLoading('onboarding-loading');
+                
+                // Show success message and redirect to login
+                document.getElementById('onboarding-success').style.display = 'block';
+                document.getElementById('onboarding-form').style.display = 'none';
+                
+                // Hide token display section since no token is provided
+                document.querySelector('.token-success-display').style.display = 'none';
+
+            } catch (error) {
+                hideLoading('onboarding-loading');
+                showError(error.message || 'Failed to create owner account');
+            }
+        });
+
+        // Handle login form submission
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            showLoading('login-loading');
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('username', email);
+                formData.append('password', password);
+                
+                const response = await apiCall('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData
+                });
+ 
+                const data = response.data
+                accessToken = data.access_token;
+                localStorage.setItem('dims_access_token', accessToken);
+                
+                hideLoading('login-loading');
+                await loadUserContext();
+            } catch (error) {
+                hideLoading('login-loading');
+                showError(error.message || 'Invalid email or password');
+            }
+        });
+
+        // Load user context
+        async function loadUserContext() {
+            if (!accessToken) {
+                showLoginScreen();
+                return;
+            }
+
+            try {
+                // Always call /auth/me to get current user info
+                // This handles both fresh login and existing session scenarios
+                const meResponse = await apiCall('/auth/me');
+                
+                // Extract user data from response - /auth/me returns {user: {...}, message: "..."}
+                currentUser = meResponse.data || meResponse;
+                
+                updateUserInfo();
+                await loadDashboardData();
+                await loadTokens();
+                await checkLicenseStatus();
+                startLicenseStatusRefresh();
+                showMainApp();
+            } catch (error) {
+                localStorage.removeItem('dims_access_token');
+                accessToken = null;
+                showLoginScreen();
+            }
+        }
+
+        // Update user info in the UI
+        function updateUserInfo() {
+            if (!currentUser) return;
+
+            // Safety check for user.name
+            if (!currentUser.name) {
+                // Use email as fallback for name
+                currentUser.name = currentUser.email || 'Unknown User';
+            }
+
+            const nameParts = currentUser.name.split(' ');
+            const initials = nameParts.map(part => part[0]).join('').toUpperCase();
+            const role = currentUser.role || 'user';
+            const roleDisplay = role.charAt(0).toUpperCase() + role.slice(1);
+            
+            // Update header user card
+            document.getElementById('user-avatar-header').textContent = initials;
+            document.getElementById('user-name-header').textContent = currentUser.name;
+            document.getElementById('user-role-header').textContent = roleDisplay;
+            
+            // Update dropdown content
+            document.getElementById('user-name-dropdown').textContent = currentUser.name;
+            document.getElementById('user-email-dropdown').textContent = currentUser.email || 'No email';
+            document.getElementById('user-role-dropdown').textContent = roleDisplay;
+            
+            // Update legacy sidebar (now hidden but kept for compatibility)
+            const legacyAvatar = document.getElementById('user-avatar');
+            const legacyName = document.getElementById('user-name');
+            const legacyEmail = document.getElementById('user-email');
+            const legacyRole = document.getElementById('user-role');
+            
+            if (legacyAvatar) legacyAvatar.textContent = initials;
+            if (legacyName) legacyName.textContent = currentUser.name;
+            if (legacyEmail) legacyEmail.textContent = currentUser.email || 'No email';
+            if (legacyRole) legacyRole.textContent = `Role: ${roleDisplay}`;
+
+            // Show/hide navigation items based on role
+            const roleManagementNav = document.querySelector('[data-section="role-management"]')?.parentElement;
+            const userManagementNav = document.querySelector('[data-section="user-management"]')?.parentElement;
+            
+            if (currentUser.role === 'owner') {
+                if (roleManagementNav) roleManagementNav.style.display = 'block';
+                if (userManagementNav) userManagementNav.style.display = 'block';
+            } else {
+                if (roleManagementNav) roleManagementNav.style.display = 'none';
+                if (userManagementNav) userManagementNav.style.display = 'none';
+            }
+        }
+
+        // License Warning Functions
+        async function checkLicenseStatus() {
+            try {
+                // Try to get license information from API
+                const response = await apiCall('/license/status');
+                licenseInfo = response.data || response;
+                
+                if (licenseInfo && licenseInfo.status === 'valid') {
+                    const daysLeft = licenseInfo.days_remaining;
+                    
+                    // Show warning if license expires within 30 days
+                    if (daysLeft <= 30 && daysLeft > 0) {
+                        showLicenseWarning(daysLeft, licenseInfo);
+                    } else if (daysLeft <= 0) {
+                        showLicenseExpired(licenseInfo);
+                    }
+                } else if (licenseInfo && licenseInfo.status !== 'valid') {
+                    // License is invalid or expired
+                    showLicenseExpired(licenseInfo);
+                }
+            } catch (error) {
+                console.log('License status check failed:', error.message);
+                // If license API is not available, simulate a warning for demo purposes
+                // Remove this in production
+                if (Math.random() < 0.3) { // 30% chance to show demo warning
+                    const demoDaysLeft = Math.floor(Math.random() * 30) + 1;
+                    showLicenseWarning(demoDaysLeft, {
+                        license_tier: 'demo',
+                        customer_id: 'demo-customer',
+                        expiry_date: new Date(Date.now() + demoDaysLeft * 24 * 60 * 60 * 1000).toISOString()
+                    });
+                }
+            }
+        }
+
+        function showLicenseWarning(daysLeft, licenseData) {
+            const warningPanel = document.getElementById('license-warning-panel');
+            const daysElement = document.getElementById('license-days-left');
+            
+            if (warningPanel && daysElement) {
+                // Reset styling to Tailwind yellow theme
+                warningPanel.style.background = '#fefce8'; /* bg-yellow-50 */
+                warningPanel.style.borderColor = '#fde047'; /* border-yellow-200 */
+                warningPanel.style.color = '';
+                
+                // Reset text colors
+                const titleElement = warningPanel.querySelector('.license-warning-title');
+                const actionButton = warningPanel.querySelector('.license-warning-action');
+                const closeButton = warningPanel.querySelector('.license-warning-close');
+                
+                if (titleElement) {
+                    titleElement.style.color = '#92400e'; /* text-yellow-800 */
+                }
+                if (daysElement) {
+                    daysElement.style.color = '#a16207'; /* text-yellow-700 */
+                }
+                if (actionButton) {
+                    actionButton.style.background = '#92400e'; /* text-yellow-800 */
+                    actionButton.style.color = '#fefce8'; /* bg-yellow-50 */
+                    actionButton.innerHTML = '<i data-lucide="refresh-cw" class="license-action-icon"></i>Renew';
+                }
+                if (closeButton) {
+                    closeButton.style.color = '#a16207'; /* text-yellow-700 */
+                }
+                
+                // Update days left text
+                daysElement.textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left`;
+                
+                // Set title without license tier
+                if (titleElement) {
+                    titleElement.textContent = 'License Expiring Soon';
+                }
+                
+                // Show the warning panel
+                warningPanel.style.display = 'block';
+                
+                // Re-initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        function showLicenseExpired(licenseData) {
+            const warningPanel = document.getElementById('license-warning-panel');
+            const daysElement = document.getElementById('license-days-left');
+            const titleElement = warningPanel.querySelector('.license-warning-title');
+            const actionButton = warningPanel.querySelector('.license-warning-action');
+            const iconElement = warningPanel.querySelector('.license-warning-icon i');
+            
+            if (warningPanel && daysElement && titleElement && actionButton && iconElement) {
+                // Update styling for expired license using shadcn/ui destructive theme
+                titleElement.textContent = 'License Expired';
+                daysElement.textContent = 'Contact support';
+                actionButton.innerHTML = '<i data-lucide="phone" class="license-action-icon"></i>Contact Support';
+                
+                // Update icon to alert-circle for expired
+                iconElement.setAttribute('data-lucide', 'alert-circle');
+                
+                // Update panel styling to destructive theme
+                warningPanel.style.background = 'hsl(var(--destructive))';
+                warningPanel.style.borderColor = 'hsl(var(--destructive))';
+                warningPanel.style.color = 'hsl(var(--destructive-foreground))';
+                
+                // Update text colors
+                titleElement.style.color = 'hsl(var(--destructive-foreground))';
+                daysElement.style.color = 'hsl(var(--destructive-foreground) / 0.8)';
+                
+                // Update action button styling
+                actionButton.style.background = 'hsl(var(--destructive-foreground))';
+                actionButton.style.color = 'hsl(var(--destructive))';
+                
+                // Update close button styling
+                const closeButton = warningPanel.querySelector('.license-warning-close');
+                if (closeButton) {
+                    closeButton.style.color = 'hsl(var(--destructive-foreground) / 0.7)';
+                }
+                
+                warningPanel.style.display = 'block';
+                
+                // Set title without license tier
+                titleElement.textContent = 'License Expired';
+                
+                // Re-initialize Lucide icons for the new icon
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        function dismissLicenseWarning() {
+            const warningPanel = document.getElementById('license-warning-panel');
+            if (warningPanel) {
+                warningPanel.style.display = 'none';
+            }
+        }
+
+        function handleLicenseWarning() {
+            // Display license information and renewal options
+            if (licenseInfo) {
+                const tierDisplay = licenseInfo.license_tier ? 
+                    licenseInfo.license_tier.charAt(0).toUpperCase() + licenseInfo.license_tier.slice(1) : 'Unknown';
+                const expiryDate = licenseInfo.expiry_date ? 
+                    new Date(licenseInfo.expiry_date).toLocaleDateString() : 'Unknown';
+                const customerId = licenseInfo.customer_id || 'Unknown';
+                
+                alert(`License Renewal Required\n\n` +
+                      `License Tier: ${tierDisplay}\n` +
+                      `Customer ID: ${customerId}\n` +
+                      `Expiry Date: ${expiryDate}\n` +
+                      `Days Remaining: ${licenseInfo.days_remaining}\n\n` +
+                      `Renewal Options:\n` +
+                      `• Contact support for enterprise licenses\n` +
+                      `• Visit billing portal for self-service renewal\n` +
+                      `• Upgrade to higher tier for extended features`);
+            } else {
+                alert('License renewal functionality would be implemented here.\n\nThis would typically:\n- Open a license renewal modal\n- Redirect to billing portal\n- Contact support for enterprise licenses');
+            }
+        }
+
+        // Refresh license status periodically (every 5 minutes)
+        function startLicenseStatusRefresh() {
+            setInterval(async () => {
+                if (accessToken && currentUser) {
+                    await checkLicenseStatus();
+                }
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Try to load stats from API first
+                let stats = null;
+                try {
+                    const response = await apiCall('/tokens/statistics/dashboard');
+                    stats = response.data
+                } catch (apiError) {
+
+                    // If API endpoint doesn't exist, try to get basic token stats
+                    try {
+                        const resp = await apiCall('/tokens');
+                        const tokenData = resp.data
+                        if (tokenData && tokenData.tokens) {
+                            const tokens = tokenData.tokens;
+                            const activeTokens = tokens.filter(token => 
+                                token.is_active && (!token.expires_at || new Date(token.expires_at) > new Date())
+                            ).length;
+                            const expiredTokens = tokens.filter(token => 
+                                token.expires_at && new Date(token.expires_at) <= new Date()
+                            ).length;
+                            const revokedTokens = tokens.filter(token => 
+                                !token.is_active
+                            ).length;
+                            
+                            stats = {
+                                active_tokens: activeTokens,
+                                expired_tokens: expiredTokens,
+                                revoked_tokens: revokedTokens,
+                                total_api_calls: '-',
+                                success_rate: '-'
+                            };
+                        }
+                    } catch (tokenError) {
+                        // If even token API fails, use default values
+                        stats = {
+                            active_tokens: 0,
+                            expired_tokens: 0,
+                            revoked_tokens: 0,
+                            total_api_calls: '-',
+                            success_rate: '-'
+                        };
+                    }
+                }
+                
+                const statsGrid = document.getElementById('dashboard-stats');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.active_tokens || 0}</div>
+                        <div class="stat-label">Active Tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.expired_tokens || 0}</div>
+                        <div class="stat-label">Expired Tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.revoked_tokens || 0}</div>
+                        <div class="stat-label">Revoked Tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.total_api_calls || '-'}</div>
+                        <div class="stat-label">API Calls Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.success_rate ? stats.success_rate + '%' : '-'}</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                // Show fallback dashboard with basic message
+                const statsGrid = document.getElementById('dashboard-stats');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">-</div>
+                        <div class="stat-label">Active Tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">-</div>
+                        <div class="stat-label">Expired Tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">-</div>
+                        <div class="stat-label">Revoked Tokens</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">-</div>
+                        <div class="stat-label">API Calls Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">-</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Load tokens
+        async function loadTokens() {
+            try {
+                const resp = await apiCall('/tokens');
+                renderTokens(resp.data.tokens);
+            } catch (error) {
+                console.error('Failed to load tokens:', error);
+                document.getElementById('token-list').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <p>Failed to load tokens: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render tokens in the UI
+        function renderTokens(tokens) {
+            const tokenList = document.getElementById('token-list');
+            
+            if (!tokens || tokens.length === 0) {
+                tokenList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <h3>No tokens found</h3>
+                        <p>Create your first access token to get started with the API.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            tokenList.innerHTML = tokens.map(token => {
+                const isActive = token.is_active && (!token.expires_at || new Date(token.expires_at) > new Date());
+                const statusClass = isActive ? 'status-active' : 'status-expired';
+                const statusText = isActive ? 'Active' : 'Expired';
+                
+                const scopeTags = token.scopes.map(scope => {
+                    let scopeClass = '';
+                    if (scope.includes('admin')) scopeClass = 'admin';
+                    else if (scope.includes('read')) scopeClass = 'read';
+                    else if (scope === 'api') scopeClass = 'system';
+                    
+                    return `<span class="scope-tag ${scopeClass}">${scope}</span>`;
+                }).join('');
+
+                const createdDate = new Date(token.created_at).toLocaleDateString();
+                const lastUsed = token.last_used_at ? 
+                    new Date(token.last_used_at).toLocaleDateString() : 'Never';
+
+                return `
+                    <div class="token-card">
+                        <div class="token-header">
+                            <div>
+                                <div class="token-name">${token.name}</div>
+                                <div class="token-meta">
+                                    Created: ${createdDate} • Last used: ${lastUsed} • 
+                                    <span class="${statusClass}">${statusText}</span>
+                                </div>
+                            </div>
+                            <div class="token-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="viewTokenDetails('${token.id}')">View</button>
+                                ${isActive ? `<button class="btn btn-danger btn-sm" onclick="revokeToken('${token.id}')">Revoke</button>` : 
+                                            `<button class="btn btn-danger btn-sm" onclick="deleteToken('${token.id}')">Delete</button>`}
+                            </div>
+                        </div>
+                        <div class="scope-tags">
+                            ${scopeTags}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show create token modal
+        function showCreateTokenModal() {
+            populateScopeSelector();
+            showModal('create-token-modal');
+        }
+
+        // Populate scope selector
+        function populateScopeSelector() {
+            const selector = document.getElementById('scope-selector');
+            
+            let selectorHTML = '';
+            Object.keys(AVAILABLE_SCOPES).forEach(category => {
+                selectorHTML += `
+                    <div class="scope-category">
+                        <div class="scope-category-title">${category}</div>
+                        <div class="scope-options">
+                `;
+                
+                AVAILABLE_SCOPES[category].forEach(scope => {
+                    const scopeClass = scope.type === 'admin' ? 'admin' : 
+                                     scope.type === 'read' ? 'read' : 
+                                     scope.type === 'system' ? 'system' : '';
+                    
+                    selectorHTML += `
+                        <label class="scope-option">
+                            <div class="scope-card">
+                                <input type="checkbox" name="scopes" value="${scope.id}" class="scope-checkbox">
+                                <div class="scope-content">
+                                    <div class="scope-title">${scope.title}</div>
+                                    <div class="scope-description">${scope.description}</div>
+                                    <span class="scope-badge ${scopeClass}">${scope.id}</span>
+                                </div>
+                            </div>
+                        </label>
+                    `;
+                });
+                
+                selectorHTML += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            selector.innerHTML = selectorHTML;
+
+            // Add event listeners
+            selector.querySelectorAll('input[name="scopes"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const option = this.closest('.scope-option');
+                    if (this.checked) {
+                        option.classList.add('checked');
+                    } else {
+                        option.classList.remove('checked');
+                    }
+                });
+            });
+
+            // Make scope cards clickable
+            selector.querySelectorAll('.scope-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        e.preventDefault();
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+            });
+        }
+
+        // Handle create token form submission
+        document.getElementById('create-token-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('token-name').value;
+            const description = document.getElementById('token-description').value;
+            const expiration = document.getElementById('token-expiration').value;
+            const selectedScopes = Array.from(document.querySelectorAll('input[name="scopes"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedScopes.length === 0) {
+                showError('Please select at least one scope for the token.');
+                return;
+            }
+
+            if (!name.trim()) {
+                showError('Token name is required.');
+                return;
+            }
+
+            try {
+                const tokenData = {
+                    name: name,
+                    scopes: selectedScopes
+                };
+
+                if (description) {
+                    tokenData.description = description;
+                }
+
+                if (expiration) {
+                    tokenData.expires_in = parseInt(expiration);
+                }
+
+
+
+                const response = await apiCall('/tokens', {
+                    method: 'POST',
+                    body: JSON.stringify(tokenData)
+                });
+
+
+                const data = response.data
+                // Show success modal
+                document.getElementById('created-token-name').textContent = data.name;
+                document.getElementById('created-token-value').textContent = data.token;
+                
+                const scopesContainer = document.getElementById('created-token-scopes');
+                scopesContainer.innerHTML = data.scopes.map(scope => {
+                    let scopeClass = '';
+                    if (scope.includes('admin')) scopeClass = 'admin';
+                    else if (scope.includes('read')) scopeClass = 'read';
+                    else if (scope === 'api') scopeClass = 'system';
+                    
+                    return `<span class="scope-tag ${scopeClass}">${scope}</span>`;
+                }).join('');
+
+                closeModal('create-token-modal');
+                showModal('token-success-modal');
+                
+                // Reset form
+                document.getElementById('create-token-form').reset();
+                document.querySelectorAll('.scope-option').forEach(option => {
+                    option.classList.remove('checked');
+                });
+                
+                // Reload tokens
+                await loadTokens();
+                
+            } catch (error) {
+                showError(error.message || 'Failed to create token');
+            }
+        });
+
+        // Revoke token
+        async function revokeToken(tokenId) {
+            if (confirm('Are you sure you want to revoke this token? This action cannot be undone.')) {
+                try {
+                    await apiCall(`/tokens/${tokenId}/revoke`, { method: 'DELETE' });
+                    showSuccess('Token revoked successfully.');
+                    await loadTokens();
+                } catch (error) {
+                    showError(error.message || 'Failed to revoke token');
+                }
+            }
+        }
+
+        // Delete token
+        async function deleteToken(tokenId) {
+            if (confirm('Are you sure you want to delete this token? This action cannot be undone.')) {
+                try {
+                    await apiCall(`/tokens/${tokenId}`, { method: 'DELETE' });
+                    showSuccess('Token deleted successfully.');
+                    await loadTokens();
+                } catch (error) {
+                    showError(error.message || 'Failed to delete token');
+                }
+            }
+        }
+
+        // View token details
+        async function viewTokenDetails(tokenId) {
+            try {
+                const response = await apiCall(`/tokens/${tokenId}`);
+                const token = response.data
+
+                const createdDate = token.created_at ? new Date(token.created_at).toLocaleString() : '-';
+                const expiresAt = token.expires_at ? new Date(token.expires_at).toLocaleString() : 'Never';
+                const lastUsed = token.last_used_at ? new Date(token.last_used_at).toLocaleString() : 'Never';
+                const statusText = token.is_active ? 'Active' : 'Inactive';
+                const statusClass = token.is_active ? 'status-active' : 'status-expired';
+                const scopeTags = (token.scopes || []).map(scope => {
+                    let scopeClass = '';
+                    if (scope.includes('admin')) scopeClass = 'admin';
+                    else if (scope.includes('read')) scopeClass = 'read';
+                    else if (scope === 'api') scopeClass = 'system';
+                    return `<span class="scope-tag ${scopeClass}">${scope}</span>`;
+                }).join(' ');
+
+                const recent = Array.isArray(token.recent_usage) ? token.recent_usage : [];
+                const recentRows = recent.length ? recent.map(u => {
+                    const uts = u.timestamp ? new Date(u.timestamp).toLocaleString() : '-';
+                    const umethod = u.method || '-';
+                    const uendpoint = u.endpoint || '-';
+                    const ustatus = u.status_code ?? '-';
+                    const uip = u.ip_address || '-';
+                    const uclass = (Number(ustatus) >= 400) ? 'status-expired' : 'status-active';
+                    return `
+                        <tr>
+                            <td>${uts}</td>
+                            <td>${umethod}</td>
+                            <td>${uendpoint}</td>
+                            <td><span class="status-badge ${uclass}">${ustatus}</span></td>
+                            <td>${uip}</td>
+                        </tr>
+                    `;
+                }).join('') : `<tr><td colspan="5" style="color:#6c757d">No recent usage</td></tr>`;
+
+                const body = document.getElementById('view-token-body');
+                body.innerHTML = `
+                    <div class="card" style="margin:0;">
+                        <div class="card-header">${token.name}</div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <div style="color:#6c757d; font-size:0.85rem;">Token ID</div>
+                                <div style="font-weight:600;">${token.id || '-'}</div>
+                            </div>
+                            <div>
+                                <div style="color:#6c757d; font-size:0.85rem;">Status</div>
+                                <div><span class="status-badge ${statusClass}">${statusText}</span></div>
+                            </div>
+                            <div>
+                                <div style="color:#6c757d; font-size:0.85rem;">Created At</div>
+                                <div style="font-weight:600;">${createdDate}</div>
+                            </div>
+                            <div>
+                                <div style="color:#6c757d; font-size:0.85rem;">Expires At</div>
+                                <div style="font-weight:600;">${expiresAt}</div>
+                            </div>
+                            <div>
+                                <div style="color:#6c757d; font-size:0.85rem;">Last Used</div>
+                                <div style="font-weight:600;">${lastUsed}</div>
+                            </div>
+                            <div>
+                                <div style="color:#6c757d; font-size:0.85rem;">Description</div>
+                                <div style="font-weight:600;">${token.description || '-'}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:16px;">
+                            <div style="color:#6c757d; font-size:0.85rem; margin-bottom:6px;">Scopes</div>
+                            <div class="scope-tags">${scopeTags || '-'}</div>
+                        </div>
+                        <div style="margin-top:16px;">
+                            <div style="color:#6c757d; font-size:0.85rem; margin-bottom:6px;">Recent Usage</div>
+                            <div style="overflow:auto; max-height:320px; border:1px solid #e9ecef; border-radius:8px;">
+                                <table class="table" style="margin:0;">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Method</th>
+                                            <th>Endpoint</th>
+                                            <th>Status</th>
+                                            <th>IP</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${recentRows}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                showModal('view-token-modal');
+            } catch (error) {
+                showError(error.message || 'Failed to load token details');
+            }
+        }
+
+        // Copy functions
+
+        function copyCreatedToken() {
+            copyToClipboard(document.getElementById('created-token-value').textContent, event.target);
+        }
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                const originalBg = button.style.background;
+                
+                button.textContent = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = originalBg;
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Token copied to clipboard!');
+            });
+        }
+
+        // Proceed to login after onboarding
+        function proceedToApp() {
+            showLoginScreen();
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('dims_access_token');
+                accessToken = null;
+                currentUser = null;
+                showLoginScreen();
+            }
+        }
+
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all nav links and sections
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked nav link
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const sectionId = this.getAttribute('data-section');
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.classList.add('active');
+                    }
+
+                    // Lazy-load content when switching to tabs
+                    if (sectionId === 'audit-logs') {
+                        loadAuditLogs();
+                    } else if (sectionId === 'about') {
+                        loadAboutInfo();
+                    }
+                });
+            });
+        });
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Utility functions
+        function showLoading(loadingId) {
+            document.getElementById(loadingId).classList.add('active');
+        }
+
+        function hideLoading(loadingId) {
+            document.getElementById(loadingId).classList.remove('active');
+        }
+
+        function showError(message) {
+            const existingAlerts = document.querySelectorAll('.alert-danger');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = `<strong>Error:</strong> ${message}`;
+            
+            const activeScreen = document.querySelector('#onboarding-screen:not([style*="display: none"]), #login-screen:not([style*="display: none"])');
+            if (activeScreen) {
+                const content = activeScreen.querySelector('.onboarding-content');
+                content.insertBefore(alert, content.firstChild);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            } else {
+                // Show error in main app
+                const contentArea = document.querySelector('.content-area');
+                if (contentArea) {
+                    contentArea.insertBefore(alert, contentArea.firstChild);
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 5000);
+                }
+            }
+        }
+
+        function showSuccess(message) {
+            const existingAlerts = document.querySelectorAll('.alert-success');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success';
+            alert.innerHTML = `<strong>Success:</strong> ${message}`;
+            
+            const contentArea = document.querySelector('.content-area');
+            if (contentArea) {
+                contentArea.insertBefore(alert, contentArea.firstChild);
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }
+        }
+
+        // --------------------
+        // Audit Logs Integration
+        // --------------------
+        let auditPage = 1;
+        let auditTotalPages = 1;
+        let auditPageSize = 10;
+        let auditFilters = { endpoint: '', status: '', from: '', to: '' };
+
+        async function loadAuditLogs(page = 1) {
+            try {
+                const params = new URLSearchParams();
+                params.append('page', page);
+                params.append('page_size', auditPageSize);
+                if (auditFilters.endpoint) params.append('endpoint', auditFilters.endpoint);
+                if (auditFilters.status) params.append('status_code', auditFilters.status);
+                if (auditFilters.from) params.append('start_date', new Date(auditFilters.from).toISOString());
+                if (auditFilters.to) params.append('end_date', new Date(auditFilters.to).toISOString());
+
+                const resp = await apiCall(`/audit/api-activities?${params.toString()}`);
+                
+                // Extract data from the actual response structure
+                const data = resp.data || resp;
+                const activities = data.items || [];
+                
+                // Handle pagination using metadata field from API response
+                const metadata = data.metadata || {};
+                const pagination = {
+                    page: metadata.page || page,
+                    total_pages: metadata.total_pages || Math.max(1, Math.ceil((metadata.total_items || activities.length) / auditPageSize)),
+                    total_items: metadata.total_items || activities.length,
+                    page_size: metadata.page_size || auditPageSize
+                };
+
+                renderAuditLogs(activities);
+                updateAuditPagination(pagination.page, pagination.total_pages, pagination.total_items);
+            } catch (error) {
+                console.error('Failed to load audit logs:', error);
+                const tbody = document.getElementById('audit-logs-body');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="9" style="color:#6c757d">Failed to load audit logs: ${error.message}</td></tr>`;
+                }
+            }
+        }
+
+        function renderAuditLogs(items) {
+            const tbody = document.getElementById('audit-logs-body');
+            if (!tbody) return;
+
+            if (!items || items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="color:#6c757d">No audit logs found</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = items.map(a => {
+                const ts = a.timestamp ? new Date(a.timestamp).toLocaleString() : '-';
+                const auth = a.auth_type || '-';
+                const userId = a.user_id ? a.user_id.substring(0, 8) + '...' : '-'; // Truncate user ID for display
+                const tokenId = a.token_id ? a.token_id.substring(0, 8) + '...' : '-'; // Truncate token ID for display
+                const endpoint = a.endpoint || '-';
+                const method = a.method || '-';
+                const ip = a.ip_address || '-';
+                const status = a.status_code || '-';
+                const statusClass = (status >= 400) ? 'status-expired' : 'status-active';
+                const risk = a.risk_level || 'low';
+                
+                // Add risk level styling
+                let riskClass = '';
+                switch(risk.toLowerCase()) {
+                    case 'high':
+                        riskClass = 'status-expired';
+                        break;
+                    case 'medium':
+                        riskClass = 'status-badge';
+                        break;
+                    case 'low':
+                    default:
+                        riskClass = 'status-active';
+                        break;
+                }
+                
+                return `
+                    <tr>
+                        <td>${ts}</td>
+                        <td>${auth}</td>
+                        <td title="${a.user_id || ''}">${userId}</td>
+                        <td title="${a.token_id || ''}">${tokenId}</td>
+                        <td>${endpoint}</td>
+                        <td>${method}</td>
+                        <td>${ip}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td><span class="status-badge ${riskClass}">${risk}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateAuditPagination(page, totalPages, totalItems = 0) {
+            auditPage = page;
+            auditTotalPages = totalPages || 1;
+            
+            const info = document.getElementById('audit-page-info');
+            const prev = document.getElementById('audit-prev');
+            const next = document.getElementById('audit-next');
+            
+            // Calculate item range for current page
+            const startItem = totalItems > 0 ? ((page - 1) * auditPageSize) + 1 : 0;
+            const endItem = Math.min(page * auditPageSize, totalItems);
+            
+            // Update pagination info with more details
+            if (info) {
+                if (totalItems > 0) {
+                    info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} items (Page ${auditPage} / ${auditTotalPages})`;
+                } else {
+                    info.textContent = `Page ${auditPage} / ${auditTotalPages}`;
+                }
+            }
+            
+            // Update button states
+            if (prev) prev.disabled = auditPage <= 1;
+            if (next) next.disabled = auditPage >= auditTotalPages;
+        }
+
+        function changeAuditPage(delta) {
+            const newPage = auditPage + delta;
+            if (newPage < 1 || newPage > auditTotalPages) return;
+            
+            // Show loading state
+            const tbody = document.getElementById('audit-logs-body');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <div style="display: inline-flex; align-items: center; gap: 10px;">
+                                <div style="width: 20px; height: 20px; border: 2px solid #f3f3f3; border-top: 2px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                Loading audit logs...
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            loadAuditLogs(newPage);
+        }
+
+        function applyAuditFilters() {
+            const endpoint = document.getElementById('audit-filter-endpoint')?.value?.trim() || '';
+            const status = document.getElementById('audit-filter-status')?.value?.trim() || '';
+            const from = document.getElementById('audit-filter-from')?.value || '';
+            const to = document.getElementById('audit-filter-to')?.value || '';
+            auditFilters = { endpoint, status, from, to };
+            auditPage = 1; // Reset to first page when applying filters
+            loadAuditLogs(1);
+        }
+
+        function resetAuditFilters() {
+            document.getElementById('audit-filter-endpoint').value = '';
+            document.getElementById('audit-filter-status').value = '';
+            document.getElementById('audit-filter-from').value = '';
+            document.getElementById('audit-filter-to').value = '';
+            auditFilters = { endpoint: '', status: '', from: '', to: '' };
+            auditPage = 1; // Reset to first page when resetting filters
+            loadAuditLogs(1);
+        }
+
+        // Add keyboard navigation for pagination
+        document.addEventListener('keydown', function(event) {
+            // Only handle keyboard navigation when audit logs section is active
+            const auditSection = document.getElementById('audit-logs');
+            if (!auditSection || !auditSection.classList.contains('active')) return;
+            
+            // Handle arrow keys for pagination
+            if (event.key === 'ArrowLeft' && auditPage > 1) {
+                event.preventDefault();
+                changeAuditPage(-1);
+            } else if (event.key === 'ArrowRight' && auditPage < auditTotalPages) {
+                event.preventDefault();
+                changeAuditPage(1);
+            }
+        });
+
+        // Add placeholder functions for role and user management
+        function showCreateRoleModal() {
+            // Create role modal - functionality to be implemented
+        }
+
+        function showInviteUserModal() {
+            // Invite user modal - functionality to be implemented
+        }
+
+        function toggleRoleEdit(roleName) {
+            // Toggle role edit for: roleName
+        }
+
+        function saveRoleScopes(roleName) {
+            // Save role scopes for: roleName
+        }
+
+        function cancelRoleEdit(roleName) {
+            // Cancel role edit for: roleName
+        }
+
+        function editUser(userId) {
+            // Edit user: userId
+        }
+
+        function deleteUser() {
+            // Delete user
+        }
+
+        function filterUsers() {
+            // Filter users
+        }
+
+        // User dropdown functionality
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('user-card-dropdown');
+            const menu = document.getElementById('user-dropdown-menu');
+            
+            dropdown.classList.toggle('active');
+            menu.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('user-card-dropdown');
+            const menu = document.getElementById('user-dropdown-menu');
+            
+            if (dropdown && menu && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+                menu.classList.remove('active');
+            }
+        });
+
+        // Placeholder functions for new dropdown actions
+        function showAccountSettings() {
+            alert('Account Settings feature coming soon!');
+            toggleUserDropdown(); // Close dropdown
+        }
+
+        function showPreferences() {
+            alert('Preferences feature coming soon!');
+            toggleUserDropdown(); // Close dropdown
+        }
+
+        // Enhanced logout function
+        function logout() {
+            toggleUserDropdown(); // Close dropdown first
+            if (confirm('Are you sure you want to sign out?')) {
+                localStorage.removeItem('dims_access_token');
+                accessToken = null;
+                currentUser = null;
+                showLoginScreen();
+            }
+        }
+
+        // About Section Functions
+        async function loadAboutInfo() {
+            try {
+                await loadSystemInfo();
+                await loadLicenseInfo();
+            } catch (error) {
+                console.error('Failed to load about information:', error);
+            }
+        }
+
+        async function loadSystemInfo() {
+            try {
+                // Update server status
+                const serverStatusElement = document.getElementById('server-status');
+                if (serverStatusElement) {
+                    serverStatusElement.textContent = 'Online';
+                    serverStatusElement.className = 'status-badge status-success';
+                }
+            } catch (error) {
+                console.error('Failed to load system info:', error);
+            }
+        }
+
+        async function loadLicenseInfo() {
+            try {
+                if (licenseInfo) {
+                    // Update license information
+                    const licenseStatusElement = document.getElementById('license-status');
+                    const licenseTierElement = document.getElementById('license-tier');
+                    const customerIdElement = document.getElementById('customer-id');
+                    const licenseExpiryElement = document.getElementById('license-expiry');
+                    const licenseDaysElement = document.getElementById('license-days-remaining');
+
+                    if (licenseStatusElement) {
+                        licenseStatusElement.textContent = licenseInfo.status === 'valid' ? 'Valid' : 'Invalid';
+                        licenseStatusElement.className = licenseInfo.status === 'valid' ? 
+                            'status-badge status-success' : 'status-badge status-expired';
+                    }
+
+                    if (licenseTierElement) {
+                        const tierDisplay = licenseInfo.license_tier ? 
+                            licenseInfo.license_tier.charAt(0).toUpperCase() + licenseInfo.license_tier.slice(1) : 'Unknown';
+                        licenseTierElement.textContent = tierDisplay;
+                    }
+
+                    if (customerIdElement) {
+                        customerIdElement.textContent = licenseInfo.customer_id || 'Unknown';
+                    }
+
+                    if (licenseExpiryElement) {
+                        const expiryDate = licenseInfo.expiry_date ? 
+                            new Date(licenseInfo.expiry_date).toLocaleDateString() : 'Unknown';
+                        licenseExpiryElement.textContent = expiryDate;
+                    }
+
+                    if (licenseDaysElement) {
+                        licenseDaysElement.textContent = licenseInfo.days_remaining ? 
+                            `${licenseInfo.days_remaining} days` : 'Unknown';
+                    }
+                } else {
+                    // Load license info if not already loaded
+                    await checkLicenseStatus();
+                    await loadLicenseInfo(); // Recursive call to update UI
+                }
+            } catch (error) {
+                console.error('Failed to load license info:', error);
+            }
+        }
+
+
+        // Support functions
+        function openDocumentation() {
+            alert('Documentation would open here.\n\nThis would typically redirect to:\n- API documentation\n- User guides\n- Integration examples');
+        }
+
+        function checkSystemHealth() {
+            alert('System Health Check\n\nThis would typically:\n- Check database connectivity\n- Verify license status\n- Test API endpoints\n- Check system resources');
+        }
+
+        function showLicenseWarningPanel() {
+            // Force show the license warning panel
+            if (licenseInfo && licenseInfo.days_remaining <= 30) {
+                showLicenseWarning(licenseInfo.days_remaining, licenseInfo);
+            } else {
+                // Show demo warning if no license info or not expiring soon
+                const demoDaysLeft = Math.floor(Math.random() * 30) + 1;
+                showLicenseWarning(demoDaysLeft, {
+                    license_tier: 'demo',
+                    customer_id: 'demo-customer',
+                    expiry_date: new Date(Date.now() + demoDaysLeft * 24 * 60 * 60 * 1000).toISOString()
+                });
+            }
+        }
+
+
+    </script>
+</body>
+</html>
