@@ -219,7 +219,7 @@ terraform.rc
 old_*
 
 # VSCode
-.vscode
+# .vscode
 
 # Azure Functions artifacts
 bin

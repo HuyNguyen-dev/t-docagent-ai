@@ -1,0 +1,23 @@
+{
+    "servers": {
+        "my-mcp-server-8cb10d75": {
+            "type": "sse",
+            "url": "http://11.11.7.225:8888/mcp/tools"
+        },
+        "my-mcp-server-bbbbbbbb": {
+            "type": "sse",
+            "url": "http://11.11.7.225:4200/test/mcp"
+        },
+        "my-mcp-server-ccccc": {
+            "type": "sse",
+            "url": "https://mcp.context7.com/mcp"
+        },
+        // "my-mcp-server-41d3ecfe": {
+        //     "type": "stdio",
+        //     "command": "python",
+        //     "args": [
+        //         "/mnt/e/Projects/dims-ai/src/server.py"
+        //     ]
+        // }
+    }
+}

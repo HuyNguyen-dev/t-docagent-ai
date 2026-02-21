@@ -1,4 +1,5 @@
 # DIMS-AI
+
 **Document Intelligence Multi-Agent System**
 
 DIMS-AI is an autonomous document processing system that leverages a coordinated team of specialized AI agents to handle the complete document lifecycle—from initial configuration through extraction to end-to-end business processing.
@@ -37,12 +38,14 @@ The system is built as a FastAPI-based microservice with the following key compo
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://gitlab.tma.com.vn/agentic-document-intelligent/dims-ai.git
    cd dims-ai
    ```
 
 2. **Install dependencies:**
+
    ```bash
    uv sync
    ```
@@ -51,6 +54,7 @@ The system is built as a FastAPI-based microservice with the following key compo
    There are two ways to configure environment variables—choose one:
 
    - Option A: Export environment variables directly in your shell (recommended for rapid development)
+
      ```bash
      export MONGODB_DSN="mongodb://localhost:27017"
      export MONGODB_DATABASE_NAME="agentic-document-intelligence"
@@ -70,11 +74,14 @@ The system is built as a FastAPI-based microservice with the following key compo
      ```
 
    - Option B: Use a `.env` file
-     1) Set `APP_HOME` to the project root so the system can auto-load the `.env` file per `src/config.py`
+     1. Set `APP_HOME` to the project root so the system can auto-load the `.env` file per `src/config.py`
+
      ```bash
       export APP_HOME="$(pwd)"   # when you are at the repository root
      ```
-     2) Create a `.env` file at the repository root and fill in the following variables:
+
+     1. Create a `.env` file at the repository root and fill in the following variables:
+
      ```bash
      # Database
      MONGODB_DSN=mongodb://localhost:27017
@@ -107,6 +114,7 @@ The system is built as a FastAPI-based microservice with the following key compo
      ```
 
 4. **Required Environment Variables:**
+
    ```bash
    # Database
    MONGODB_DSN=mongodb://localhost:27017
@@ -128,6 +136,7 @@ The system is built as a FastAPI-based microservice with the following key compo
    ```
 
 5. **Start the application:**
+
    ```bash
    python src/app.py
    ```
@@ -171,6 +180,7 @@ The API will run at `http://localhost:8888` (default per `src/config.py`) with i
 #### API Examples
 
 - Discover Annotations
+
   ```bash
   curl -X POST "http://localhost:8888/api/v1/document-intelligence/discover-annotations" \
     -H "accept: application/json" \
@@ -186,6 +196,7 @@ The API will run at `http://localhost:8888` (default per `src/config.py`) with i
   ```
 
 - Discover Mapping
+
   ```bash
   curl -X POST "http://localhost:8888/api/v1/document-intelligence/discover-mapping" \
     -H "accept: application/json" \
@@ -197,11 +208,13 @@ The API will run at `http://localhost:8888` (default per `src/config.py`) with i
   ```
 
 - LLM List Models
+
   ```bash
   curl "http://localhost:8888/api/v1/llm/list-models?llm_provider=OPENAI"
   ```
 
 - LLM Complete
+
   ```bash
   curl -X POST "http://localhost:8888/api/v1/llm/complete?model_name=gpt-4o-mini" \
     -H "Content-Type: application/json" \
@@ -307,9 +320,9 @@ See `pyproject.toml` for the complete list of dependencies.
 
 ## 👥 Authors
 
-- **Danh Nguyen** - ntdanh@tma.com.vn
-- **Than Vo** - vmthan@tma.com.vn
-- **Trieu Nguyen** - nvtrieu@tma.com.vn
+- **Danh Nguyen** - <ntdanh@tma.com.vn>
+- **Than Vo** - <vmthan@tma.com.vn>
+- **Trieu Nguyen** - <nvtrieu@tma.com.vn>
 
 ## 📄 License
 
